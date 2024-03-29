@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">IDCard</string>
+
+    <string name="sign_up">Don\'t have an account yet? <b>Sign Up</b></string>
+
+    <string name="home_footer_text">Powered by RJR Creation 2024,All rights reserved.</string>
+    <string name="about_content">“Card Pro” is a digital Data Application by “Eagle Art”. We are leading business profession in making Different types of Identity Cards and pursuing impeccable level of integrity and the highest standard have always been our main focus. We have successfully provided and maintain our highest level of Quality service and cost effectiveness to our customers.</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>

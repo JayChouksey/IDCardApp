@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/email_verification"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg"
+    tools:context=".EmailVerification"
+    android:gravity="center"
+    android:padding="16dp"
+    android:orientation="vertical">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- App Logo -->
+            <ImageView
+                android:id="@+id/appLogo"
+                android:layout_width="150dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="16dp"
+                android:src="@drawable/logo" />
+
+            <!-- Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Email Verification"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- OTP Label -->
+            <TextView
+                android:id="@+id/tokenprint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enter the OTP sent to your email:"
+                android:layout_gravity="center"
+                android:textSize="18sp"/>
+
+            <!-- OTP EditText -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:layout_marginBottom="16dp">
+
+                <!-- First Digit -->
+                <EditText
+                    android:id="@+id/editTextDigit1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="number"
+                    android:maxLength="1"
+                    android:layout_marginEnd="8dp"
+                    android:padding="8dp"/>
+
+                <!-- Second Digit -->
+                <EditText
+                    android:id="@+id/editTextDigit2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="number"
+                    android:maxLength="1"
+                    android:layout_marginEnd="8dp"
+                    android:padding="8dp"/>
+
+                <!-- Third Digit -->
+                <EditText
+                    android:id="@+id/editTextDigit3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="number"
+                    android:maxLength="1"
+                    android:layout_marginEnd="8dp"
+                    android:padding="8dp"/>
+
+                <!-- Fourth Digit -->
+                <EditText
+                    android:id="@+id/editTextDigit4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="number"
+                    android:maxLength="1"
+                    android:padding="8dp"/>
+            </LinearLayout>
+
+            <!-- Verify Button -->
+            <Button
+                android:id="@+id/buttonVerify"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Verify"
+                android:backgroundTint="#035495"
+                android:layout_marginTop="24dp"/>
+
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+</LinearLayout>

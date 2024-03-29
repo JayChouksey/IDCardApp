@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- Internet Permission -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.IDCard"
+        tools:targetApi="31">
+        <activity
+            android:name=".PrintedStudent"
+            android:exported="false" />
+        <activity
+            android:name=".ReadyToPrintStudent"
+            android:exported="false" />
+        <activity
+            android:name=".PendingStudent"
+            android:exported="false" />
+        <activity
+            android:name=".EmailVerification"
+            android:exported="false" />
+        <activity
+            android:name=".ForgetPassword"
+            android:exported="false" />
+        <activity
+            android:name=".Service"
+            android:exported="false" />
+        <activity
+            android:name=".ImportStudents"
+            android:exported="false" />
+        <activity
+            android:name=".AddStudent"
+            android:exported="false" />
+        <activity
+            android:name=".ListStudents"
+            android:exported="false" />
+        <activity
+            android:name=".SchoolList"
+            android:exported="false" />
+        <activity
+            android:name=".AddSchool"
+            android:exported="false" />
+        <activity
+            android:name=".Contact"
+            android:exported="false" />
+        <activity
+            android:name=".About"
+            android:exported="false" />
+        <activity
+            android:name=".SignUp"
+            android:exported="false" />
+        <activity
+            android:name=".Login"
+            android:exported="true">
+
+            <!-- Modify the intent-filter to make Login the launcher activity -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity> <!-- Remove the intent-filter from MainActivity -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <!-- Remove this line -->
+                <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

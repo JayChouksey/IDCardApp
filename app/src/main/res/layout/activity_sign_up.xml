@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/app_bg"
+    android:id="@+id/signup"
+    tools:context=".SignUp">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- App Logo -->
+                <ImageView
+                    android:id="@+id/appLogo"
+                    android:layout_width="150dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/logo" />
+
+                <!-- Sign Up Heading -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Sign Up"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <!-- Full Name -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Full Name*"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/editTextFullName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edittext_background"
+                    android:padding="10dp"
+                    android:layout_marginTop="10dp"
+                    android:hint="Enter your full name" />
+
+                <!-- City -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="City*"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/editTextCity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edittext_background"
+                    android:padding="10dp"
+                    android:layout_marginTop="10dp"
+                    android:hint="Enter your city" />
+
+                <!-- District -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="District*"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/editTextDistrict"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edittext_background"
+                    android:padding="10dp"
+                    android:layout_marginTop="10dp"
+                    android:hint="Enter your district" />
+
+                <!-- State -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="State*"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/editTextState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edittext_background"
+                    android:padding="10dp"
+                    android:layout_marginTop="10dp"
+                    android:hint="Enter your state" />
+
+                <!-- Email Id -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Email Id*"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/editTextEmailId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter your email id"
+                    android:background="@drawable/edittext_background"
+                    android:padding="10dp"
+                    android:layout_marginTop="10dp"
+                    android:inputType="textEmailAddress" />
+
+                <!-- Firm/Company Name -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Firm/Company Name"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/editTextFirmName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edittext_background"
+                    android:padding="10dp"
+                    android:layout_marginTop="10dp"
+                    android:hint="Enter your firm/company name" />
+
+                <!-- Password -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Password*"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/editTextPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter your password"
+                    android:background="@drawable/edittext_background"
+                    android:padding="10dp"
+                    android:layout_marginTop="10dp"
+                    android:inputType="textPassword" />
+
+                <!-- Confirm Password -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Confirm Password*"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/editTextConfirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Confirm your password"
+                    android:background="@drawable/edittext_background"
+                    android:padding="10dp"
+                    android:layout_marginTop="10dp"
+                    android:inputType="textPassword" />
+
+                <!-- WhatsApp Mobile No. -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="WhatsApp Mobile No."
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/editTextWhatsApp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edittext_background"
+                    android:padding="10dp"
+                    android:layout_marginTop="10dp"
+                    android:hint="Enter your WhatsApp mobile no."
+                    android:inputType="phone" />
+
+                <!-- Sign Up Button -->
+                <Button
+                    android:id="@+id/btnSignUp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="#035495"
+                    android:text="Sign Up"
+                    android:textColor="#FFFFFF" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </ScrollView>
+
+</LinearLayout>
