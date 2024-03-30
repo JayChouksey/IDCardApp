@@ -1,24 +1,171 @@
 package com.example.idcard;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.idcard.recyclerfiles.DynamicStudent;
+import com.example.idcard.recyclerfiles.DynamicStudentAdapter;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class PrintedStudent extends AppCompatActivity {
 
+    RecyclerView recyclerView;
+    DynamicStudentAdapter adapter;
+
+    Intent intent;
+    TextView text;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_printed_student);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
+        intent = getIntent();
+
+        // Setting user text name to user
+        TextView userName = findViewById(R.id.userName);
+        userName.setText(getUserName());
+
+        text = findViewById(R.id.selectText);
+
+        fetchStudentData();
+        clearSchoolId(); // clearing school id, stored locally
     }
+    // Main method ends
+
+
+    private void fetchStudentData() {
+        // Get the authorization token
+        String token = getToken(); // From local storage
+        String id = getId(); // From local storage
+        String status = intent.getStringExtra("Status");
+
+        String url = "https://id-card-backend-2.onrender.com/user/students/" + id + "?status=" + status;
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, null,
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Toast.makeText(PrintedStudent.this, "Data Fetched Successfully", Toast.LENGTH_SHORT).show();
+                        List<DynamicStudent> studentList = new ArrayList<>();
+                        try {
+                            JSONArray studentsArray = response.getJSONArray("students");
+                            for (int i = 0; i < studentsArray.length(); i++) {
+                                JSONObject studentObject = studentsArray.getJSONObject(i);
+                                DynamicStudent student = new DynamicStudent();
+
+                                // Iterate over the keys of the JSON object
+                                Iterator<String> keys = studentObject.keys();
+                                while (keys.hasNext()) {
+                                    String key = keys.next();
+                                    // Check if the key is "avatar"
+                                    if (key.equals("avatar")) {
+                                        // Break the loop if "avatar" is encountered
+                                        break;
+                                    }
+                                    // Skip if the key is "_id"
+                                    if (key.equals("_id")) {
+                                        continue;
+                                    }
+                                    String value = studentObject.getString(key);
+                                    student.addField(key, value);
+                                }
+                                studentList.add(student);
+                            }
+
+                            // Updating recycler view for data fetching
+                            updateRecyclerView(studentList);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    String errorMessage = new String(error.networkResponse.data);
+                    Toast.makeText(PrintedStudent.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(PrintedStudent.this, "Error adding student", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> header = new HashMap<>();
+                header.put("Authorization", token);
+                return header;
+            }
+        };
+
+        // Add the request to the RequestQueue
+        queue.add(jsonObjectRequest);
+    }
+
+    // Method to update school list recycler view
+    private void updateRecyclerView(List<DynamicStudent> studentList) {
+        recyclerView = findViewById(R.id.student_list_recycle);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(PrintedStudent.this));
+        adapter = new DynamicStudentAdapter(studentList);
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged(); // Notify adapter of dataset changes
+    }
+    // End of method to update school list recycler view
+
+    // Method to get the data saved in local storage
+    private String getToken() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("token", "");
+    }
+
+    private String getId() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("schoolId", "");
+    }
+
+    private String getUserName() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("name", "");
+    }
+
+    private void clearSchoolId() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("schoolId");
+        editor.apply();
+    }
+    // End of method to get data saved in local storage
 }

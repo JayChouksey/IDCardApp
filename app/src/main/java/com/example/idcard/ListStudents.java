@@ -1,6 +1,7 @@
 package com.example.idcard;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -48,7 +49,8 @@ public class ListStudents extends AppCompatActivity {
     List<String> schoolNames = new ArrayList<>(); // List to store school names
     List<String> schoolId = new ArrayList<>(); // List to store schoolId
     String [] status = {"Pending","Ready To Print","Printed"};
-    String strStatus = "Panding"; // not a typo
+    String strStatus; // To send the status to next activity
+    Intent intentPending, intentReadyToPrint, intentPrinted;
 
     AutoCompleteTextView autoCompleteSchool, autoCompleteStatus;
     ArrayAdapter<String> adapterSchool, adapterStatus;
@@ -63,6 +65,12 @@ public class ListStudents extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_students);
 
+        // Initializing the intent
+        intentPending = new Intent(ListStudents.this, PendingStudent.class);
+        intentReadyToPrint = new Intent(ListStudents.this, ReadyToPrintStudent.class);
+        intentPrinted = new Intent(ListStudents.this, PrintedStudent.class);
+
+        // Setting user text name to user
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
 
@@ -81,8 +89,6 @@ public class ListStudents extends AppCompatActivity {
         autoCompleteStatus.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = parent.getItemAtPosition(position).toString();
-                //Toast.makeText(getApplicationContext(),"Item: "+item,Toast.LENGTH_SHORT).show();
                 // Switch case to set strStatus based on selected item
                 switch (position) {
                     case 0:
@@ -97,6 +103,27 @@ public class ListStudents extends AppCompatActivity {
                 }
             }
         });
+
+        // Switch to next Activity according to the status
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(strStatus.equals("Panding")){
+                    intentPending.putExtra("Status",strStatus);
+                    startActivity(intentPending);
+                }
+                else if(strStatus.equals("Ready to print")){
+                    intentReadyToPrint.putExtra("Status",strStatus);
+                    startActivity(intentReadyToPrint);
+
+                }
+                else{
+                    intentPrinted.putExtra("Status",strStatus);
+                    startActivity(intentPrinted);
+                }
+            }
+        });
+
 
 
     }
@@ -145,12 +172,12 @@ public class ListStudents extends AppCompatActivity {
                                 }
                                 studentList.add(student);
                             }
-                            submit.setOnClickListener(new View.OnClickListener() {
+                          /*  submit.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     updateRecyclerView(studentList);
                                 }
-                            });
+                            });*/
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -242,7 +269,8 @@ public class ListStudents extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String item = parent.getItemAtPosition(position).toString();
                 //Toast.makeText(getApplicationContext(),"Item: "+idArray[position],Toast.LENGTH_SHORT).show();
-                fetchStudentData(idArray[position] );
+                //fetchStudentData(idArray[position]);
+                saveSchoolId(idArray[position]); // storing the id of the school locally
             }
         });
     }
@@ -260,6 +288,13 @@ public class ListStudents extends AppCompatActivity {
     }
 
     // Method to get the token saved in local storage
+
+    private void saveSchoolId(String id) {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("schoolId", id);
+        editor.apply();
+    }
     private String getToken() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         return sharedPreferences.getString("token", "");
