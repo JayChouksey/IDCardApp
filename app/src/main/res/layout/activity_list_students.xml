@@ -146,20 +146,6 @@
                             android:background="@drawable/button_background"
                             android:text="Submit" />
 
-                        <LinearLayout
-                            android:id="@+id/dynamicLinearLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-
-                        </LinearLayout>
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/student_list_recycle"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="20dp"/>
-
                     </LinearLayout>
 
                 </androidx.cardview.widget.CardView>

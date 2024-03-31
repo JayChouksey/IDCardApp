@@ -42,7 +42,7 @@ public class PendingStudent extends AppCompatActivity {
     DynamicStudentAdapter adapter;
 
     Intent intent;
-    TextView text;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +53,6 @@ public class PendingStudent extends AppCompatActivity {
         // Setting user text name to user
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
-         text = findViewById(R.id.selectText);
 
         fetchStudentData();
         clearSchoolId(); // clearing school id, stored locally

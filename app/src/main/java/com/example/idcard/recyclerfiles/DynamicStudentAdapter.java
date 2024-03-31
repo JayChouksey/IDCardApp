@@ -1,5 +1,6 @@
 package com.example.idcard.recyclerfiles;
 
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.idcard.R;
@@ -43,15 +45,37 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
 
     public class DynamicStudentViewHolder extends RecyclerView.ViewHolder {
         private LinearLayout dynamicLinearLayout;
+        private CardView cardView;
 
         public DynamicStudentViewHolder(@NonNull View itemView) {
             super(itemView);
             dynamicLinearLayout = itemView.findViewById(R.id.dynamicLinearLayout);
+            cardView = itemView.findViewById(R.id.cardView);
+
+            /// Handle item click event
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        // Toggle selection status
+                        DynamicStudent student = studentList.get(position);
+                        student.setSelected(!student.isSelected());
+                        notifyItemChanged(position); // Notify adapter of data change
+                    }
+                }
+            });
         }
 
         public void bind(DynamicStudent student) {
             // Clear existing views
             dynamicLinearLayout.removeAllViews();
+
+            if (student.isSelected()) {
+                cardView.setBackgroundResource(R.drawable.border_selected);
+            } else {
+                cardView.setBackgroundResource(R.drawable.border_unselected);
+            }
 
             // Loop through all fields and add TextViews dynamically
             for (Map.Entry<String, String> entry : student.getFields().entrySet()) {
@@ -64,7 +88,7 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
                 linearLayout.setLayoutParams(new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT));
-                linearLayout.setPadding(10,10,10,10);
+                linearLayout.setPadding(20,10,10,10);
                 linearLayout.setOrientation(LinearLayout.HORIZONTAL);
 
                 // Create TextView for Title

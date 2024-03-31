@@ -41,7 +41,6 @@ public class ReadyToPrintStudent extends AppCompatActivity {
     RecyclerView recyclerView;
     DynamicStudentAdapter adapter;
     Intent intent;
-    TextView text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +53,6 @@ public class ReadyToPrintStudent extends AppCompatActivity {
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
 
-        text = findViewById(R.id.selectText);
 
         fetchStudentData();
 

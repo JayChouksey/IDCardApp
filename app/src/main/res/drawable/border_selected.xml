@@ -1,0 +1,5 @@
+<!-- border_selected.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <stroke android:color="#8692f7" android:width="3dp" /> <!-- Red border -->
+    <solid android:color="#E6DCF3" /> <!-- Transparent background -->
+</shape>

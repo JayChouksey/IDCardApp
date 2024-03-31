@@ -108,7 +108,8 @@
                             android:textSize="24sp"
                             android:textStyle="bold" />
 
-                        <androidx.cardview.widget.CardView
+                        <!-- Select all feature -> will implemented later -->
+                        <!--<androidx.cardview.widget.CardView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
@@ -120,6 +121,7 @@
                                 android:orientation="horizontal">
 
                                 <CheckBox
+                                    android:id="@+id/select_all"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
 
@@ -135,7 +137,7 @@
                             </LinearLayout>
 
 
-                        </androidx.cardview.widget.CardView>
+                        </androidx.cardview.widget.CardView>-->
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/school_list_recycle"
