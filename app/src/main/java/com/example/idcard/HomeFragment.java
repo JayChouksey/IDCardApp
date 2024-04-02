@@ -70,6 +70,7 @@ public class HomeFragment extends Fragment {
             public void onClick(View v) {
                 // Create an Intent to start the activity
                 Intent intent = new Intent(getActivity(), AddSchool.class);
+                intent.putExtra("from","Home");
 
                 // Start the activity
                 startActivity(intent);

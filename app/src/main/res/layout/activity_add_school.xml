@@ -98,6 +98,7 @@
 
                         <!-- Add School Heading -->
                         <TextView
+                            android:id="@+id/textview_add_school"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"

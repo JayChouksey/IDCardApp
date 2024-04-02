@@ -1,20 +1,30 @@
 package com.example.idcard.recyclerfiles;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.idcard.AddSchool;
+import com.example.idcard.MainActivity;
 import com.example.idcard.R;
 
 import java.util.List;
 
+import com.example.idcard.api.SchoolDeletionHelper;
+
 public class SchoolInfoAdapter extends RecyclerView.Adapter<SchoolInfoAdapter.ViewHolder> {
 
     private List<SchoolInfo> schoolInfoList;
+    private SharedPreferences sharedPreferences;
 
     public SchoolInfoAdapter(List<SchoolInfo> schoolInfoList) {
         this.schoolInfoList = schoolInfoList;
@@ -63,6 +73,10 @@ public class SchoolInfoAdapter extends RecyclerView.Adapter<SchoolInfoAdapter.Vi
         private TextView textAllowedFields;
         private TextView textAllowedFieldsValue;
 
+        private Button btnBlock; // later work
+        private Button btnEdit;
+        private Button btnDelete;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             textDistributor = itemView.findViewById(R.id.textDistributor);
@@ -85,6 +99,67 @@ public class SchoolInfoAdapter extends RecyclerView.Adapter<SchoolInfoAdapter.Vi
             textCreatedValue = itemView.findViewById(R.id.textCreatedValue);
             textAllowedFields = itemView.findViewById(R.id.textAllowedFields);
             textAllowedFieldsValue = itemView.findViewById(R.id.textAllowedFieldsValue);
+
+            // Buttons
+            // btnBlock = itemView.findViewById(R.id.btnBlock); --> Later Work
+            btnEdit = itemView.findViewById(R.id.btnEdit);
+            btnDelete = itemView.findViewById(R.id.btnDelete);
+
+            sharedPreferences = itemView.getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            String token = sharedPreferences.getString("token", "");
+
+            // Set click listeners for buttons --> Later work
+            /*btnBlock.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Handle Block button click
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        SchoolInfo schoolInfo = schoolInfoList.get(position);
+                    }
+                }
+            });*/
+
+            btnEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Handle Edit button click
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        SchoolInfo schoolInfo = schoolInfoList.get(position);
+
+                        // Storing id in local storage
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("schoolIdFromListStudent", schoolInfo.getId());
+                        editor.apply();
+
+                        Intent intent = new Intent(itemView.getContext(), AddSchool.class);
+                        // Pass any data you need to the AddSchool class using intent extras
+                        intent.putExtra("from","SchoolList");
+                        intent.putExtra("nameSchool",textSchoolName.getText().toString().trim());
+                        intent.putExtra("contactSchool",textSchoolMobileValue.getText().toString().trim());
+                        intent.putExtra("emailSchool",textEmailValue.getText().toString().trim());
+                        intent.putExtra("addressSchool",textSchoolAddressValue.getText().toString().trim());
+                        intent.putExtra("codeSchool",textSchoolCodeValue.getText().toString().trim());
+                        itemView.getContext().startActivity(intent);
+                    }
+                }
+            });
+
+            btnDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Handle Delete button click
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        SchoolInfo schoolInfo = schoolInfoList.get(position);
+                        SchoolDeletionHelper.deleteSchool(itemView.getContext(), schoolInfo.getId(), token);
+                        schoolInfoList.remove(position);
+                        notifyItemRemoved(position);
+                        //Toast.makeText(itemView.getContext(), "Delete button clicked for " + schoolInfo.getId(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
 
         public void bind(SchoolInfo schoolInfo) {

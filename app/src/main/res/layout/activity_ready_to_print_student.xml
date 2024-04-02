@@ -140,7 +140,7 @@
                         </androidx.cardview.widget.CardView>-->
 
                         <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/school_list_recycle"
+                            android:id="@+id/student_list_recycle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="20dp"/>

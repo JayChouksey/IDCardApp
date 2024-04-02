@@ -8,6 +8,7 @@ public class DynamicStudent {
     private Map<String, String> fields;
     private boolean isSelected; // Field to track selection status
 
+
     public DynamicStudent() {
         this.fields = new HashMap<>();
         this.isSelected = false; // Default selection status is false
@@ -32,4 +33,5 @@ public class DynamicStudent {
     public void setSelected(boolean selected) {
         isSelected = selected;
     }
+
 }

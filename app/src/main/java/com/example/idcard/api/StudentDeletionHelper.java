@@ -1,8 +1,6 @@
 package com.example.idcard.api;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -12,20 +10,15 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.idcard.AddSchool;
 
-
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SchoolDeletionHelper {
-
-
-    public static void deleteSchool(Context context, String schoolId, String token) {
-        String url = "https://id-card-backend-2.onrender.com/user/delete/school/" + schoolId;
+public class StudentDeletionHelper {
+    public static void deleteStudent(Context context, String studentId, String token) {
+        String url = "https://id-card-backend-2.onrender.com/user/delete/student/" + studentId;
 
         RequestQueue queue = Volley.newRequestQueue(context);
 
@@ -34,7 +27,7 @@ public class SchoolDeletionHelper {
                     @Override
                     public void onResponse(JSONObject response) {
                         // Handle successful response here
-                        Toast.makeText(context, "School deleted successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Student deleted successfully", Toast.LENGTH_SHORT).show();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -61,4 +54,3 @@ public class SchoolDeletionHelper {
         queue.add(jsonObjectRequest);
     }
 }
-

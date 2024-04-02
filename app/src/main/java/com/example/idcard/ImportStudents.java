@@ -24,6 +24,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -37,6 +38,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,15 +52,10 @@ public class ImportStudents extends AppCompatActivity {
     List<String> requiredFieldsList = new ArrayList<>(); // List to store the required fields for student details
     AutoCompleteTextView autoCompleteSchool;
     ArrayAdapter<String> adapterSchool;
-    private static final int PICK_FILE_REQUEST_CODE = 1;
-
-    private File imgFile; // Global variable to store the selected image file
 
     // Image  picker
-    private static final int PICK_IMAGE_REQUEST_CODE = 1;
-    private Button btnChooseImage;
     private TextView noFileChosen;
-    private String filePath; // To store the selected file path
+    private String filePath; // To store the selected Excel file path
     private static final int REQUEST_CODE = 123;
 
 
@@ -90,12 +87,6 @@ public class ImportStudents extends AppCompatActivity {
         chooseFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Open file chooser intent
-               /* Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("application/vnd.ms-excel"); // Filter for Excel files
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                startActivityForResult(intent, PICK_FILE_REQUEST_CODE);*/
-
                 // Open file picker
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // Excel MIME type
@@ -105,6 +96,68 @@ public class ImportStudents extends AppCompatActivity {
 
     }
     // Main function ends
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+            Uri fileUri = data.getData();
+            filePath = getRealPathFromUri(fileUri); // Get actual path from URI
+            noFileChosen.setText(filePath.substring(filePath.lastIndexOf("/") + 1)); // Display filename
+        }
+    }
+    private String getRealPathFromUri(Uri uri) {
+        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(uri,
+                filePathColumn, null, null, null);
+        cursor.moveToFirst();
+        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+        String picturePath = cursor.getString(columnIndex);
+        cursor.close();
+        return picturePath;
+    }
+
+
+    /*private void uploadImageToServer() {
+        if (filePath == null || filePath.isEmpty()) {
+            // Handle error: no image selected
+            return;
+        }
+
+        String url = "https://id-card-backend-2.onrender.com/user/registration/school";
+        String token = "YOUR_ACCESS_TOKEN"; // Replace with your actual token
+
+        VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, url,
+                new Response.Listener<NetworkResponse>() {
+                    @Override
+                    public void onResponse(NetworkResponse response) {
+                        // Handle successful upload response (e.g., parse JSON)
+                        String result = new String(response.data, Charset.defaultCharset());
+                        Toast.makeText(ImportStudents.this, "Image uploaded: " + result, Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle upload error
+                        Toast.makeText(ImportStudents.this, "Error uploading image: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        // Set Authorization header
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + token);
+        multipartRequest.setHeaders(headers);
+
+        multipartRequest.addFilePart("image", new File(imagePath));
+
+        // Add other form data parts if needed (replace "param1" and "value1" with your data)
+        // multipartRequest.addFormDataPart("param1", "value1");
+
+        // Add the request to the Volley queue
+        Volley.getInstance(this).addToRequestQueue(multipartRequest);
+    }*/
 
     // ------------------------------------------------------------------------------------------------------------------------
 

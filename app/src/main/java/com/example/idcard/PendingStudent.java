@@ -5,14 +5,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,12 +34,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+
 public class PendingStudent extends AppCompatActivity {
 
     RecyclerView recyclerView;
     DynamicStudentAdapter adapter;
-
     Intent intent;
+    TextView text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,13 +50,44 @@ public class PendingStudent extends AppCompatActivity {
         setContentView(R.layout.activity_pending_student);
 
         intent = getIntent();
+        text = findViewById(R.id.text);
 
         // Setting user text name to user
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
 
+        // Fetching student data
         fetchStudentData();
+
+        Button delete = findViewById(R.id.deleteButton);
+        Button statusReadyToPrint = findViewById(R.id.moveReadyToPrintButton);
+        Button statusPrinted = findViewById(R.id.movePrintedButton);
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String id = getSelectedStudentIds();
+                deleteStudents(id);
+            }
+        });
+        statusReadyToPrint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String id = getSelectedStudentIds();
+                changeStatusReadyToPrint(id);
+            }
+        });
+        statusPrinted.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String id = getSelectedStudentIds();
+                changeStatusPrinted(id);
+            }
+        });
+
+
+
         clearSchoolId(); // clearing school id, stored locally
+
     }
     // Main method ends
 
@@ -93,9 +125,9 @@ public class PendingStudent extends AppCompatActivity {
                                         break;
                                     }
                                     // Skip if the key is "_id"
-                                    if (key.equals("_id")) {
+                                   /* if (key.equals("_id")) {
                                         continue;
-                                    }
+                                    }*/
                                     String value = studentObject.getString(key);
                                     student.addField(key, value);
                                 }
@@ -131,6 +163,7 @@ public class PendingStudent extends AppCompatActivity {
         // Add the request to the RequestQueue
         queue.add(jsonObjectRequest);
     }
+
     // End of Fetching student data
 
     // Method to update school list recycler view
@@ -142,7 +175,160 @@ public class PendingStudent extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged(); // Notify adapter of dataset changes
     }
+
+    // Method to get the id of the student from Student Adapter class to change the status of the student
+    private String getSelectedStudentIds() {
+      return adapter.getSelectedStudentIds();
+    }
+
     // End of method to update school list recycler view
+
+    // Method to delete and change student status
+    public void changeStatusReadyToPrint(String studentIds) {
+        // Create JSON object with the request body
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("studentIds", studentIds);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Create request URL
+        String schoolId = getId();
+        String url = "https://id-card-backend-2.onrender.com/user/student/change-status/readyto/" + schoolId;
+
+        // Create request
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Handle response
+                        Toast.makeText(PendingStudent.this, "Status of selected students updated successfully", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle error
+                        if (error.networkResponse != null) {
+                            // If there's an error response from the server, handle it here
+                            String errorMessage = new String(error.networkResponse.data);
+                            Toast.makeText(PendingStudent.this, "Error:" + errorMessage, Toast.LENGTH_SHORT).show();
+                            error.printStackTrace();
+                        }
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                // Set authorization header
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", getToken());
+                return headers;
+            }
+        };
+
+        // Add the request to the RequestQueue
+        RequestQueue requestQueue = Volley.newRequestQueue(PendingStudent.this);
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    public void changeStatusPrinted(String studentIds) {
+        // Create JSON object with the request body
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("studentIds", studentIds);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Create request URL
+        String schoolId = getId();
+        String url = "https://id-card-backend-2.onrender.com/user/student/change-status/pending/" + schoolId;
+
+        // Create request
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Handle response
+                        Toast.makeText(PendingStudent.this, "Status of selected students updated successfully", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle error
+                        if (error.networkResponse != null) {
+                            // If there's an error response from the server, handle it here
+                            String errorMessage = new String(error.networkResponse.data);
+                            Toast.makeText(PendingStudent.this, "Error:" + errorMessage, Toast.LENGTH_SHORT).show();
+                            error.printStackTrace();
+                        }
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                // Set authorization header
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", getToken());
+                return headers;
+            }
+        };
+
+        // Add the request to the RequestQueue
+        RequestQueue requestQueue = Volley.newRequestQueue(PendingStudent.this);
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    public void deleteStudents(String studentIds) {
+        // Create JSON object with the request body
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("studentIds", studentIds);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Create request URL
+        String schoolId = getId();
+        String url = "https://id-card-backend-2.onrender.com/user/students/delete/" + schoolId;
+
+        // Create request
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Handle response
+                        Toast.makeText(PendingStudent.this, "Status of selected students updated successfully", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle error
+                        if (error.networkResponse != null) {
+                            // If there's an error response from the server, handle it here
+                            String errorMessage = new String(error.networkResponse.data);
+                            Toast.makeText(PendingStudent.this, "Error:" + errorMessage, Toast.LENGTH_SHORT).show();
+                            error.printStackTrace();
+                        }
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                // Set authorization header
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", getToken());
+                return headers;
+            }
+        };
+
+        // Add the request to the RequestQueue
+        RequestQueue requestQueue = Volley.newRequestQueue(PendingStudent.this);
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    // End of Method to delete and change student status
 
 
 

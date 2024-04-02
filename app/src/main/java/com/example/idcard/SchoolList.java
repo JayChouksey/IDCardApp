@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 public class SchoolList extends AppCompatActivity {
 
@@ -98,6 +99,7 @@ public class SchoolList extends AppCompatActivity {
                             for (int i = 0; i < schoolsArray.length(); i++) {
                                 JSONObject schoolObject = schoolsArray.getJSONObject(i);
                                 String distributorName = getUserName();
+                                String id = schoolObject.getString("_id");
                                 String name = schoolObject.getString("name");
                                 String email = schoolObject.getString("email");
                                 int contact = schoolObject.getInt("contact");
@@ -122,7 +124,7 @@ public class SchoolList extends AppCompatActivity {
 
                                 // Create a SchoolInfo object and add it to the list
                                 SchoolInfo schoolInfo = new SchoolInfo(distributorName, name, email, contactStr, address, codeStr,
-                                        studentNumber, status, date, requiredFields);
+                                        studentNumber, status, date, requiredFields, id);
 
 
                                 schoolInfoList.add(schoolInfo);
@@ -154,6 +156,9 @@ public class SchoolList extends AppCompatActivity {
     }
 
 
+
+
+
     private void updateRecyclerView(List<SchoolInfo> schoolInfoList) {
         recyclerView = findViewById(R.id.school_list_recycle);
         recyclerView.setHasFixedSize(true);
@@ -173,6 +178,7 @@ public class SchoolList extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         return sharedPreferences.getString("name", "");
     }
+
     // End of method to get the token saved in local storage
 
     // --------------------------------------------------------------------------------------------------------------------------

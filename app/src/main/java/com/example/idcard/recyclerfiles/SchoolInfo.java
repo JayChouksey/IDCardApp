@@ -1,5 +1,8 @@
 package com.example.idcard.recyclerfiles;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 public class SchoolInfo {
     private String distributorName;
     private String schoolName;
@@ -11,9 +14,10 @@ public class SchoolInfo {
     private String status;
     private String created;
     private String allowedFields;
+    private String id;
 
     public SchoolInfo(String distributorName, String schoolName, String email, String schoolMobile, String schoolAddress,
-                      String schoolCode, String numberOfStudents, String status, String created, String allowedFields) {
+                      String schoolCode, String numberOfStudents, String status, String created, String allowedFields, String id) {
         this.distributorName = distributorName;
         this.schoolName = schoolName;
         this.email = email;
@@ -24,6 +28,7 @@ public class SchoolInfo {
         this.status = status;
         this.created = created;
         this.allowedFields = allowedFields;
+        this.id = id;
     }
 
     public String getDistributorName() {
@@ -65,4 +70,9 @@ public class SchoolInfo {
     public String getAllowedFields() {
         return allowedFields;
     }
+
+    public String getId() {
+        return id;
+    }
+
 }

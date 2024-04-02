@@ -198,6 +198,7 @@
                             android:layout_height="wrap_content"
                             android:id="@+id/name3"
                             android:text="Import Students"
+                            android:gravity="center"
                             android:textSize="18sp"
                             android:textColor="@color/black"
                             android:layout_marginTop="10dp"
