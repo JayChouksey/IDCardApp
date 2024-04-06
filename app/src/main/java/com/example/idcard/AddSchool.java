@@ -3,11 +3,13 @@ package com.example.idcard;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -17,20 +19,30 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.PermissionChecker;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.idcard.api.VolleyMultipartRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import android.Manifest;
+
 
 // Import statements (assuming Volley library is imported)
 
@@ -42,10 +54,15 @@ public class AddSchool extends AppCompatActivity {
 
     // Image  picker
     private Button btnChooseImage;
-
     ImageView imgChosen;
     TextView textNoFileChosen;
-    // Gemini
+    private static final int REQUEST_CODE_IMAGE_PICKER = 101;
+    private static final int REQUEST_CODE_STORAGE_PERMISSION = 102;
+    File photoFile;
+    Bitmap bitmap;
+    private String filePath; // Stores the path of the selected image
+    Uri imageUri;
+
 
     private final static int PICK_IMAGE_REQUEST = 1;
 
@@ -68,6 +85,7 @@ public class AddSchool extends AppCompatActivity {
         btnSave = findViewById(R.id.btn_save);
 
 
+
         // Code to select image from the gallery
 
             btnChooseImage = findViewById(R.id.btn_choose_file);
@@ -77,9 +95,15 @@ public class AddSchool extends AppCompatActivity {
             btnChooseImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    openFileChooser();
+                    if (checkStoragePermission()) {
+                        chooseImageFromGallery();
+                    } else {
+                        requestStoragePermission();
+                    }
                 }
             });
+
+
         // End of Code to select image from the gallery
 
 
@@ -144,7 +168,6 @@ public class AddSchool extends AppCompatActivity {
                 // Reset UI and variables
                 textNoFileChosen.setText("No file chosen");
                 imgChosen.setImageBitmap(null);
-                imagePath = null;
             }
         });
         // End of Cancel button functionality
@@ -166,11 +189,18 @@ public class AddSchool extends AppCompatActivity {
 
                 if(from.equals("SchoolList")){
                     btnSave.setText("Updating...");
-                    sendDataToApi(schoolName, mobileNo, email, password, confirmPassword, address, schoolCode,id);
+                    //sendDataToApi(schoolName, mobileNo, email, password, confirmPassword, address, schoolCode,id);
+
+                   if (TextUtils.isEmpty(filePath)) {
+                        Toast.makeText(AddSchool.this, "Please select an image", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                   // new method try
                 }
                 else{
                     btnSave.setText("Saving...");
-                    sendDataToApi(schoolName, mobileNo, email, password, confirmPassword, address, schoolCode);
+                    registerSchool(bitmap,schoolName, mobileNo, email, password, confirmPassword, address, schoolCode);
+                    //sendDataToApi(schoolName, mobileNo, email, password, confirmPassword, address, schoolCode);
                 }
 
             }
@@ -200,195 +230,164 @@ public class AddSchool extends AppCompatActivity {
     // Main function ends
     // -------------------------------------------------------------------------------------------------------------------
 
+
     // sending text data to api endpoint
-    private void sendDataToApi(String schoolName, String mobileNo, String email, String password, String confirmPassword,
-                               String address, String schoolCode) {
-        String apiEndpoint = "https://id-card-backend-2.onrender.com/user/registration/school";
-        String token = getToken(); // token, saved locally
+    private void registerSchool(final Bitmap bitmap, String schoolName, String mobileNo, String email, String password, String confirmPassword,
+                              String address, String schoolCode) {
 
-        if(!schoolName.isEmpty() && !mobileNo.isEmpty() && !email.isEmpty() && !password.isEmpty() &&
-        !confirmPassword.isEmpty() && !address.isEmpty() && !schoolCode.isEmpty()){
-
-            if(password.equals(confirmPassword)){
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, apiEndpoint,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                // Handle response from the server
-                                try {
-                                    JSONObject jsonResponse = new JSONObject(response);
-                                    // Parse response JSON if needed
-                                    Toast.makeText(AddSchool.this, "Data sent successfully", Toast.LENGTH_SHORT).show();
-                                    btnSave.setText("Save");
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    btnSave.setText("Save");
-                                    Toast.makeText(AddSchool.this, "Error parsing response", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                btnSave.setText("Save");
-                                // Display error message from the server
-                                if (error.networkResponse != null && error.networkResponse.data != null) {
-                                    String errorMessage = new String(error.networkResponse.data);
-                                    Toast.makeText(AddSchool.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(AddSchool.this, "Error adding student", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        }) {
+        String URL = "https://id-card-backend-2.onrender.com/user/registration/school";
+        //our custom volley request
+        VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, URL,
+                new Response.Listener<NetworkResponse>() {
                     @Override
-                    protected Map<String, String> getParams() throws AuthFailureError {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("name", schoolName);
-                        params.put("contact", mobileNo);
-                        params.put("email", email);
-                        params.put("password", password);
-                        params.put("address", address);
-                        params.put("code", schoolCode);
-                        params.put("requiredFields", selectedNames);
-                        return params;
+                    public void onResponse(NetworkResponse response) {
+                        try {
+                            JSONObject obj = new JSONObject(new String(response.data));
+                            Toast.makeText(getApplicationContext(), "School added successfully!", Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-
+                },
+                new Response.ErrorListener() {
                     @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String> headers = new HashMap<>();
-                        headers.put("Authorization", token); // Replace "YOUR_TOKEN_HERE" with your actual token
-                        return headers;
+                    public void onErrorResponse(VolleyError error) {
+                        if (error.networkResponse != null && error.networkResponse.data != null) {
+                            String errorMessage = new String(error.networkResponse.data);
+                            Toast.makeText(AddSchool.this, errorMessage, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(AddSchool.this, "Error adding student", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                };
+                }) {
 
-                Volley.newRequestQueue(this).add(stringRequest);
-            }else{
-                Toast.makeText(AddSchool.this, "Password does not match", Toast.LENGTH_SHORT).show();
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("name", schoolName);
+                params.put("address", address);
+                params.put("contact", mobileNo);
+                params.put("email", email);
+                params.put("code", schoolCode);
+                params.put("password", password);
+                params.put("requiredFields", selectedNames);
+                return params;
             }
-        }else{
-            Toast.makeText(AddSchool.this, "Please fill all required fields", Toast.LENGTH_SHORT).show();
+
+            /*
+             * Adding photo
+             */
+            @Override
+            public Map<String, DataPart> getByteData() {
+                Map<String, DataPart> params = new HashMap<>();
+                long imagename = System.currentTimeMillis();
+                params.put("file", new DataPart(imagename + ".jpeg", getFileDataFromDrawable(bitmap)));
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", getToken()); // Replace "YOUR_TOKEN_HERE" with your actual token
+                return headers;
+            }
+
+            @Override
+            public void deliverError(VolleyError error) {
+                super.deliverError(error);
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    String errorMessage = new String(error.networkResponse.data);
+                    Toast.makeText(AddSchool.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(AddSchool.this, "Error adding student", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
+        // Check if passwords match
+        if (!password.equals(confirmPassword)) {
+            Toast.makeText(AddSchool.this, "Password does not match", Toast.LENGTH_SHORT).show();
+            return;
         }
 
+        // Check if all required fields are filled
+        if (schoolName.isEmpty() || mobileNo.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || address.isEmpty() || schoolCode.isEmpty()) {
+            Toast.makeText(AddSchool.this, "Please fill all required fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Add the request to volley
+        Volley.newRequestQueue(this).add(volleyMultipartRequest);
     }
 
     // End of sending text data to api endpoint
 
     // update school data
-    private void sendDataToApi(String schoolName, String mobileNo, String email, String password, String confirmPassword,
-                               String address, String schoolCode,String id)  {
-        String apiEndpoint = "https://id-card-backend-2.onrender.com/user/edit/school/" + id;
-        String token = getToken(); // token, saved locally
-
-        if(!schoolName.isEmpty() && !mobileNo.isEmpty() && !email.isEmpty() && !password.isEmpty() &&
-                !confirmPassword.isEmpty() && !address.isEmpty() && !schoolCode.isEmpty()){
-
-            if(password.equals(confirmPassword)){
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, apiEndpoint,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                // Handle response from the server
-                                try {
-                                    JSONObject jsonResponse = new JSONObject(response);
-                                    // Parse response JSON if needed
-                                    Toast.makeText(AddSchool.this, "Data sent successfully", Toast.LENGTH_SHORT).show();
-                                    btnSave.setText("Save");
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    btnSave.setText("Save");
-                                    Toast.makeText(AddSchool.this, "Error parsing response", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                btnSave.setText("Save");
-                                // Display error message from the server
-                                if (error.networkResponse != null && error.networkResponse.data != null) {
-                                    String errorMessage = new String(error.networkResponse.data);
-                                    Toast.makeText(AddSchool.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(AddSchool.this, "Error adding student", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        }) {
-                    @Override
-                    protected Map<String, String> getParams() throws AuthFailureError {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("name", schoolName);
-                        params.put("contact", mobileNo);
-                        params.put("email", email);
-                        params.put("password", password);
-                        params.put("address", address);
-                        params.put("code", schoolCode);
-                        params.put("requiredFields", selectedNames);
-                        return params;
-                    }
-
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String> headers = new HashMap<>();
-                        headers.put("Authorization", token); // Replace "YOUR_TOKEN_HERE" with your actual token
-                        return headers;
-                    }
-                };
-
-                Volley.newRequestQueue(this).add(stringRequest);
-            }else{
-                Toast.makeText(AddSchool.this, "Password does not match", Toast.LENGTH_SHORT).show();
-            }
-        }else{
-            Toast.makeText(AddSchool.this, "Please fill all required fields", Toast.LENGTH_SHORT).show();
-        }
-
-    }
 
     // end of  update school data
 
-
-
     // -------------------------------------------------------------------------------------------------------------------------------
 
+
     // Image upload functions
-
-    // Gemini
-
-    private void openFileChooser() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    private boolean checkStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int permissionResult = PermissionChecker.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+            return permissionResult == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return true; // Permission check not required for older versions
+        }
     }
 
-    // Gemini
-   @Override
+
+    private void requestStoragePermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_STORAGE_PERMISSION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                chooseImageFromGallery();
+            } else {
+                Toast.makeText(this, "Storage permission required to access gallery", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    private void chooseImageFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        //startActivityForResult(intent, REQUEST_CODE_IMAGE_PICKER);
+        startActivityForResult(intent, 100); // change 06/04/24 - 07:53 --> https://www.simplifiedcoding.net/upload-image-to-server/
+    }
+
+
+    // change 06/04/24 - 09:17 --> https://www.simplifiedcoding.net/upload-image-to-server/
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            Uri filePath = data.getData();
-            imagePath = getRealPathFromURI(filePath); // Get actual path from URI
+        if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
 
-            // Display selected image on UI (optional)
+            //getting the image Uri
+            Uri imageUri = data.getData();
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+                //getting bitmap object from uri
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+
+                //displaying selected image to imageview
                 imgChosen.setImageBitmap(bitmap);
-                textNoFileChosen.setText(filePath.getPath().split(":")[1]);
-            } catch (Exception e) {
+                textNoFileChosen.setText("");
+
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private String getRealPathFromURI(Uri contentUri) {
-        String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContentResolver().query(contentUri, projection, null, null, null);
-        if (cursor == null) return null;
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        String path = cursor.getString(column_index);
-        cursor.close();
-        return path;
+    public byte[] getFileDataFromDrawable(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
+        return byteArrayOutputStream.toByteArray();
     }
 
     // End of Image upload functions

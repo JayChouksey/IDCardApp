@@ -243,7 +243,7 @@ public class PendingStudent extends AppCompatActivity {
 
         // Create request URL
         String schoolId = getId();
-        String url = "https://id-card-backend-2.onrender.com/user/student/change-status/pending/" + schoolId;
+        String url = "https://id-card-backend-2.onrender.com/user/student/change-status/printed/" + schoolId;
 
         // Create request
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, requestBody,
