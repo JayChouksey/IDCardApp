@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
@@ -30,6 +31,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -44,6 +46,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.idcard.api.VolleyMultipartRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -69,7 +72,6 @@ public class ImportStudents extends AppCompatActivity {
     // Drop Down
     List<String> schoolNames = new ArrayList<>(); // List to store school names
     List<String> schoolId = new ArrayList<>();
-    List<String> requiredFieldsList = new ArrayList<>(); // List to store the required fields for student details
     AutoCompleteTextView autoCompleteSchool;
     ArrayAdapter<String> adapterSchool;
 
@@ -79,10 +81,9 @@ public class ImportStudents extends AppCompatActivity {
     // Image  picker
     private TextView noFileChosen;
     private String filePath; // To store the selected Excel file path
-    private static final int REQUEST_CODE = 123;
+    byte[] fileData;
 
-    Bitmap bitmap;
-
+    String idSchool; // to store the id of school from drop down
 
 
     @Override
@@ -105,21 +106,6 @@ public class ImportStudents extends AppCompatActivity {
         // Set click listener for the "Choose File" button
         Button chooseFileButton = findViewById(R.id.btn_choose_file);
 
-        ActivityResultLauncher<Intent> activityResultLauncher =
-                registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if(result.getResultCode() == Activity.RESULT_OK){
-                            Intent data = result.getData();
-                            Uri uri = data.getData();
-                            try {
-                                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    }
-                });
 
         chooseFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,18 +122,85 @@ public class ImportStudents extends AppCompatActivity {
         addStudnt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 addStudnt.setText("Processing...");
+                // Check if the file path is valid
 
+                    uploadExcelFile(fileData);
             }
         });
 
     }
     // Main function ends
 
-    private boolean checkStoragePermission() {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    private void uploadExcelFile(byte[] excelFileData) {
+
+        String URL = "https://id-card-backend-2.onrender.com/upload-excel/" + idSchool;
+
+        VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, URL,
+                new Response.Listener<NetworkResponse>() {
+                    @Override
+                    public void onResponse(NetworkResponse response) {
+                        try {
+                            JSONObject obj = new JSONObject(new String(response.data));
+                            Toast.makeText(getApplicationContext(), "Excel file uploaded successfully!", Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        if (error.networkResponse != null && error.networkResponse.data != null) {
+                            String errorMessage = new String(error.networkResponse.data);
+                            Toast.makeText(ImportStudents.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(ImportStudents.this, "Error uploading Excel file", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }) {
+
+            @Override
+            public Map<String, DataPart> getByteData() {
+                Map<String, DataPart> params = new HashMap<>();
+                long excelName = System.currentTimeMillis();
+                params.put("file", new DataPart(excelName + ".xlsx", excelFileData));
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", getToken());
+                return headers;
+            }
+
+            @Override
+            public void deliverError(VolleyError error) {
+                super.deliverError(error);
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    String errorMessage = new String(error.networkResponse.data);
+                    Toast.makeText(ImportStudents.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(ImportStudents.this, "Error uploading Excel file", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
+        // Add the request to volley
+        Volley.newRequestQueue(this).add(volleyMultipartRequest);
     }
+
+    // Excel upload functions
+    private boolean checkStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int permissionResult = PermissionChecker.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+            return permissionResult == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return true; // Permission check not required for older versions
+        }
+    }
+
 
     private void requestStoragePermission() {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_STORAGE_PERMISSION);
@@ -160,7 +213,7 @@ public class ImportStudents extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openFilePicker();
             } else {
-                Toast.makeText(this, "Storage permission required to access files", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Storage permission required to access gallery", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -172,23 +225,26 @@ public class ImportStudents extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, "Choose File"), REQUEST_CODE_FILE_PICKER);
     }
 
+    // Modify onActivityResult to handle Excel file selection
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == REQUEST_CODE_FILE_PICKER && resultCode == RESULT_OK) {
+            // Check if a file was selected
             if (data != null && data.getData() != null) {
-                Uri excelUri = data.getData();
-                filePath = getRealPathFromUri(excelUri); // Consider security implications
-                if (filePath != null) {
-                    String fileName = getFileName(filePath);
-                    noFileChosen.setText("Selected file: " + fileName);
-                    // Handle the selected Excel file here
-                    loadExcelFile(excelUri);
-                }
+                Uri uri = data.getData();
+
+                // Get the file path (be cautious about security implications)
+                filePath = getRealPathFromUri(uri); // Implement getRealPathFromUri function
+                fileData = getFileDataFromExcelFile(uri);
+                noFileChosen.setText("File Selected");
+
+            } else {
+                Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
             }
         }
     }
-
 
     private String getRealPathFromUri(Uri uri) {
         String path = null;
@@ -197,11 +253,11 @@ public class ImportStudents extends AppCompatActivity {
             path = uri.getPath();
         } else {
             // Try using ContentResolver for providers like MediaStore
-            CursorLoader loader = new CursorLoader(this, uri, new String[]{MediaStore.Files.FileColumns.DATA}, null, null, null);
+            CursorLoader loader = new CursorLoader(this, uri, new String[]{MediaStore.Images.Media.DATA}, null, null, null);
             Cursor cursor = loader.loadInBackground();
             if (cursor != null) {
                 if (cursor.moveToFirst()) {
-                    int pathIndex = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
+                    int pathIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
                     path = cursor.getString(pathIndex);
                 }
                 cursor.close();
@@ -210,85 +266,28 @@ public class ImportStudents extends AppCompatActivity {
         return path;
     }
 
-    private String getFileName(String filePath) {
-        if (filePath != null) {
-            return new File(filePath).getName();
-        } else {
-            return "";
-        }
-    }
 
-    private void loadExcelFile(Uri excelUri) {
+    // Method to read file into byte array
+    public byte[] getFileDataFromExcelFile(Uri fileUri) {
         try {
-            InputStream inputStream = getContentResolver().openInputStream(excelUri);
-            if (inputStream != null) {
-                // Read the Excel file content here
-                // For example, you can parse the Excel file or load it into a spreadsheet view
-                // In this example, I'll just log the file details
-                Log.d("Excel Load", "File name: " + getFileName(excelUri.getPath()));
-                Log.d("Excel Load", "File size: " + new File(excelUri.getPath()).length() + " bytes");
-            } else {
-                Log.e("Excel Load", "Input stream is null");
+            InputStream inputStream = getContentResolver().openInputStream(fileUri);
+            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+            int bufferSize = 1024;
+            byte[] buffer = new byte[bufferSize];
+            int len;
+            while ((len = inputStream.read(buffer)) != -1) {
+                byteBuffer.write(buffer, 0, len);
             }
+            return byteBuffer.toByteArray();
         } catch (IOException e) {
-            Log.e("Excel Load Error", e.toString());
+            e.printStackTrace();
+            return null;
         }
     }
 
+    // End of Excel upload functions
 
-    private void sendExcelFile(String filePath) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL("https://id-card-backend-2.onrender.com/upload-excel/66054323f8f2d8e4daeec841");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setDoOutput(true);
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty("Content-Type", "application/vnd.ms-excel");
-
-                    OutputStream os = conn.getOutputStream();
-                    FileInputStream fis = new FileInputStream(new File(filePath));
-                    byte[] buffer = new byte[4096];
-                    int bytesRead;
-                    while ((bytesRead = fis.read(buffer)) != -1) {
-                        os.write(buffer, 0, bytesRead);
-                    }
-                    os.close();
-                    fis.close();
-
-                    int responseCode = conn.getResponseCode();
-                    if (responseCode == HttpURLConnection.HTTP_OK) {
-                        Log.d("File Upload", "File uploaded successfully");
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(ImportStudents.this, "File uploaded successfully", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    } else {
-                        Log.e("File Upload", "Error response code: " + responseCode);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(ImportStudents.this, "Failed to upload file", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                    conn.disconnect();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(ImportStudents.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
-        }).start();
-    }
-
+    // ---------------------------------------------------------------------------------------------------------------------
 
 
     // Function to fetch schools from the api endpoint
@@ -364,6 +363,7 @@ public class ImportStudents extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String item = parent.getItemAtPosition(position).toString();
                 //Toast.makeText(getApplicationContext(),"Item: "+idArray[position],Toast.LENGTH_SHORT).show();
+                idSchool = idArray[position];
             }
         });
     }

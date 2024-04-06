@@ -189,18 +189,22 @@ public class AddSchool extends AppCompatActivity {
 
                 if(from.equals("SchoolList")){
                     btnSave.setText("Updating...");
-                    //sendDataToApi(schoolName, mobileNo, email, password, confirmPassword, address, schoolCode,id);
-
-                   if (TextUtils.isEmpty(filePath)) {
+                    if (bitmap == null) {
                         Toast.makeText(AddSchool.this, "Please select an image", Toast.LENGTH_SHORT).show();
+                        btnSave.setText("Edit");
                         return;
                     }
-                   // new method try
+                    updateSchool(bitmap,schoolName, mobileNo, email, password, confirmPassword, address, schoolCode,id);
+
                 }
                 else{
                     btnSave.setText("Saving...");
+                    if (bitmap == null) {
+                        Toast.makeText(AddSchool.this, "Please select an image", Toast.LENGTH_SHORT).show();
+                        btnSave.setText("Save");
+                        return;
+                    }
                     registerSchool(bitmap,schoolName, mobileNo, email, password, confirmPassword, address, schoolCode);
-                    //sendDataToApi(schoolName, mobileNo, email, password, confirmPassword, address, schoolCode);
                 }
 
             }
@@ -242,9 +246,11 @@ public class AddSchool extends AppCompatActivity {
                     @Override
                     public void onResponse(NetworkResponse response) {
                         try {
+                            btnSave.setText("Save");
                             JSONObject obj = new JSONObject(new String(response.data));
                             Toast.makeText(getApplicationContext(), "School added successfully!", Toast.LENGTH_SHORT).show();
                         } catch (JSONException e) {
+                            btnSave.setText("Save");
                             e.printStackTrace();
                         }
                     }
@@ -253,9 +259,11 @@ public class AddSchool extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         if (error.networkResponse != null && error.networkResponse.data != null) {
+                            btnSave.setText("Save");
                             String errorMessage = new String(error.networkResponse.data);
                             Toast.makeText(AddSchool.this, errorMessage, Toast.LENGTH_SHORT).show();
                         } else {
+                            btnSave.setText("Save");
                             Toast.makeText(AddSchool.this, "Error adding student", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -296,9 +304,11 @@ public class AddSchool extends AppCompatActivity {
             public void deliverError(VolleyError error) {
                 super.deliverError(error);
                 if (error.networkResponse != null && error.networkResponse.data != null) {
+                    btnSave.setText("Save");
                     String errorMessage = new String(error.networkResponse.data);
                     Toast.makeText(AddSchool.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
                 } else {
+                    btnSave.setText("Save");
                     Toast.makeText(AddSchool.this, "Error adding student", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -306,12 +316,14 @@ public class AddSchool extends AppCompatActivity {
 
         // Check if passwords match
         if (!password.equals(confirmPassword)) {
+            btnSave.setText("Save");
             Toast.makeText(AddSchool.this, "Password does not match", Toast.LENGTH_SHORT).show();
             return;
         }
 
         // Check if all required fields are filled
         if (schoolName.isEmpty() || mobileNo.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || address.isEmpty() || schoolCode.isEmpty()) {
+            btnSave.setText("Save");
             Toast.makeText(AddSchool.this, "Please fill all required fields", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -323,11 +335,104 @@ public class AddSchool extends AppCompatActivity {
     // End of sending text data to api endpoint
 
     // update school data
+    private void updateSchool(final Bitmap bitmap, String schoolName, String mobileNo, String email, String password, String confirmPassword,
+                                String address, String schoolCode, String schoolId) {
 
+        String URL = "https://id-card-backend-2.onrender.com/user/registration/school" + schoolId;
+        //our custom volley request
+        VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, URL,
+                new Response.Listener<NetworkResponse>() {
+                    @Override
+                    public void onResponse(NetworkResponse response) {
+                        try {
+                            btnSave.setText("Edit");
+                            JSONObject obj = new JSONObject(new String(response.data));
+                            Toast.makeText(getApplicationContext(), "School updated successfully!", Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            btnSave.setText("Edit");
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        if (error.networkResponse != null && error.networkResponse.data != null) {
+                            btnSave.setText("Edit");
+                            String errorMessage = new String(error.networkResponse.data);
+                            Toast.makeText(AddSchool.this, errorMessage, Toast.LENGTH_SHORT).show();
+                        } else {
+                            btnSave.setText("Edit");
+                            Toast.makeText(AddSchool.this, "Error adding student", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }) {
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("name", schoolName);
+                params.put("address", address);
+                params.put("contact", mobileNo);
+                params.put("email", email);
+                params.put("code", schoolCode);
+                params.put("password", password);
+                params.put("requiredFields", selectedNames);
+                return params;
+            }
+
+            /*
+             * Adding photo
+             */
+            @Override
+            public Map<String, DataPart> getByteData() {
+                Map<String, DataPart> params = new HashMap<>();
+                long imagename = System.currentTimeMillis();
+                params.put("file", new DataPart(imagename + ".jpeg", getFileDataFromDrawable(bitmap)));
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", getToken()); // Replace "YOUR_TOKEN_HERE" with your actual token
+                return headers;
+            }
+
+            @Override
+            public void deliverError(VolleyError error) {
+                super.deliverError(error);
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    btnSave.setText("Edit");
+                    String errorMessage = new String(error.networkResponse.data);
+                    Toast.makeText(AddSchool.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                } else {
+                    btnSave.setText("Edit");
+                    Toast.makeText(AddSchool.this, "Error adding student", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
+        // Check if passwords match
+        if (!password.equals(confirmPassword)) {
+            btnSave.setText("Edit");
+            Toast.makeText(AddSchool.this, "Password does not match", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check if all required fields are filled
+        if (schoolName.isEmpty() || mobileNo.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || address.isEmpty() || schoolCode.isEmpty()) {
+            btnSave.setText("Save");
+            Toast.makeText(AddSchool.this, "Please fill all required fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Add the request to volley
+        Volley.newRequestQueue(this).add(volleyMultipartRequest);
+    }
     // end of  update school data
 
     // -------------------------------------------------------------------------------------------------------------------------------
-
 
     // Image upload functions
     private boolean checkStoragePermission() {
