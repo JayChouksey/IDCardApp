@@ -34,9 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-
 public class PendingStudent extends AppCompatActivity {
 
     RecyclerView recyclerView;
@@ -86,7 +83,7 @@ public class PendingStudent extends AppCompatActivity {
 
 
 
-        clearSchoolId(); // clearing school id, stored locally
+        //clearSchoolId(); // clearing school id, stored locally
 
     }
     // Main method ends

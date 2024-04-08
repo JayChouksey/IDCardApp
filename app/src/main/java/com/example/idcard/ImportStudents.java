@@ -10,7 +10,9 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -75,7 +77,6 @@ public class ImportStudents extends AppCompatActivity {
     AutoCompleteTextView autoCompleteSchool;
     ArrayAdapter<String> adapterSchool;
 
-    private static final int REQUEST_CODE_STORAGE_PERMISSION = 1;
     private static final int REQUEST_CODE_FILE_PICKER = 2;
 
     // Image  picker
@@ -110,12 +111,7 @@ public class ImportStudents extends AppCompatActivity {
         chooseFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Open file picker
-              if (checkStoragePermission()) {
-                    openFilePicker();
-                } else {
-                    requestStoragePermission();
-                }
+                openFilePicker();
             }
         });
 
@@ -192,31 +188,6 @@ public class ImportStudents extends AppCompatActivity {
     }
 
     // Excel upload functions
-    private boolean checkStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int permissionResult = PermissionChecker.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-            return permissionResult == PackageManager.PERMISSION_GRANTED;
-        } else {
-            return true; // Permission check not required for older versions
-        }
-    }
-
-
-    private void requestStoragePermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_STORAGE_PERMISSION);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openFilePicker();
-            } else {
-                Toast.makeText(this, "Storage permission required to access gallery", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 
     private void openFilePicker() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);

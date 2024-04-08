@@ -84,7 +84,7 @@ public class PrintedStudent extends AppCompatActivity {
             }
         });
 
-        clearSchoolId(); // clearing school id, stored locally
+        //clearSchoolId(); // clearing school id, stored locally
     }
     // Main method ends
 

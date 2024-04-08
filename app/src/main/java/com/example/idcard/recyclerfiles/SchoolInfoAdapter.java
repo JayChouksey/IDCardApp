@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +21,7 @@ import com.example.idcard.R;
 import java.util.List;
 
 import com.example.idcard.api.SchoolDeletionHelper;
+import com.squareup.picasso.Picasso;
 
 public class SchoolInfoAdapter extends RecyclerView.Adapter<SchoolInfoAdapter.ViewHolder> {
 
@@ -72,7 +74,6 @@ public class SchoolInfoAdapter extends RecyclerView.Adapter<SchoolInfoAdapter.Vi
         private TextView textCreatedValue;
         private TextView textAllowedFields;
         private TextView textAllowedFieldsValue;
-
         private Button btnBlock; // later work
         private Button btnEdit;
         private Button btnDelete;

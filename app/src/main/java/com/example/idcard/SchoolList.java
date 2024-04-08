@@ -122,6 +122,10 @@ public class SchoolList extends AppCompatActivity {
                                 }
                                 String requiredFields = requiredFieldsBuilder.toString();
 
+                                // Get the logo URL
+                                JSONObject logoObject = schoolObject.getJSONObject("logo");
+                                String logoUrl = logoObject.getString("url");
+
                                 // Create a SchoolInfo object and add it to the list
                                 SchoolInfo schoolInfo = new SchoolInfo(distributorName, name, email, contactStr, address, codeStr,
                                         studentNumber, status, date, requiredFields, id);

@@ -56,15 +56,9 @@ public class AddSchool extends AppCompatActivity {
     private Button btnChooseImage;
     ImageView imgChosen;
     TextView textNoFileChosen;
-    private static final int REQUEST_CODE_IMAGE_PICKER = 101;
     private static final int REQUEST_CODE_STORAGE_PERMISSION = 102;
-    File photoFile;
     Bitmap bitmap;
-    private String filePath; // Stores the path of the selected image
-    Uri imageUri;
 
-
-    private final static int PICK_IMAGE_REQUEST = 1;
 
     private EditText editTextSchoolName, editTextMobileNo, editTextEmail, editTextPassword, editTextConfirmPassword, editTextAddress, editTextSchoolCode;
     private TextView addSchool;
@@ -95,11 +89,7 @@ public class AddSchool extends AppCompatActivity {
             btnChooseImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (checkStoragePermission()) {
-                        chooseImageFromGallery();
-                    } else {
-                        requestStoragePermission();
-                    }
+                    chooseImageFromGallery();
                 }
             });
 
@@ -264,7 +254,7 @@ public class AddSchool extends AppCompatActivity {
                             Toast.makeText(AddSchool.this, errorMessage, Toast.LENGTH_SHORT).show();
                         } else {
                             btnSave.setText("Save");
-                            Toast.makeText(AddSchool.this, "Error adding student", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddSchool.this, "Error adding school", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }) {
@@ -309,7 +299,7 @@ public class AddSchool extends AppCompatActivity {
                     Toast.makeText(AddSchool.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
                 } else {
                     btnSave.setText("Save");
-                    Toast.makeText(AddSchool.this, "Error adding student", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddSchool.this, "Error adding school", Toast.LENGTH_SHORT).show();
                 }
             }
         };
@@ -363,7 +353,7 @@ public class AddSchool extends AppCompatActivity {
                             Toast.makeText(AddSchool.this, errorMessage, Toast.LENGTH_SHORT).show();
                         } else {
                             btnSave.setText("Edit");
-                            Toast.makeText(AddSchool.this, "Error adding student", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddSchool.this, "Error adding school", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }) {
@@ -408,7 +398,7 @@ public class AddSchool extends AppCompatActivity {
                     Toast.makeText(AddSchool.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
                 } else {
                     btnSave.setText("Edit");
-                    Toast.makeText(AddSchool.this, "Error adding student", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddSchool.this, "Error adding school", Toast.LENGTH_SHORT).show();
                 }
             }
         };
@@ -435,31 +425,7 @@ public class AddSchool extends AppCompatActivity {
     // -------------------------------------------------------------------------------------------------------------------------------
 
     // Image upload functions
-    private boolean checkStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int permissionResult = PermissionChecker.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-            return permissionResult == PackageManager.PERMISSION_GRANTED;
-        } else {
-            return true; // Permission check not required for older versions
-        }
-    }
 
-
-    private void requestStoragePermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_STORAGE_PERMISSION);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                chooseImageFromGallery();
-            } else {
-                Toast.makeText(this, "Storage permission required to access gallery", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
     private void chooseImageFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         //startActivityForResult(intent, REQUEST_CODE_IMAGE_PICKER);

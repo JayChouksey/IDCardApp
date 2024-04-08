@@ -83,7 +83,7 @@ public class ReadyToPrintStudent extends AppCompatActivity {
             }
         });
 
-        clearSchoolId(); // clearing school id, stored locally
+        //clearSchoolId(); // clearing school id, stored locally
     }
 
     // Main method ends
@@ -160,6 +160,22 @@ public class ReadyToPrintStudent extends AppCompatActivity {
         queue.add(jsonObjectRequest);
     }
     // End of Fetching student data
+
+
+    // Method to update school list recycler view
+    private void updateRecyclerView(List<DynamicStudent> studentList) {
+        recyclerView = findViewById(R.id.student_list_recycle);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(ReadyToPrintStudent.this));
+        adapter = new DynamicStudentAdapter(studentList);
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged(); // Notify adapter of dataset changes
+    }
+    // End of Method to delete and change student status
+
+    private String getSelectedStudentIds() {
+        return adapter.getSelectedStudentIds();
+    }
 
 
     // Method to delete and change student status
@@ -306,26 +322,6 @@ public class ReadyToPrintStudent extends AppCompatActivity {
         RequestQueue requestQueue = Volley.newRequestQueue(ReadyToPrintStudent.this);
         requestQueue.add(jsonObjectRequest);
     }
-
-    // End of Method to delete and change student status
-
-
-    // Method to update school list recycler view
-    private void updateRecyclerView(List<DynamicStudent> studentList) {
-        recyclerView = findViewById(R.id.student_list_recycle);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(ReadyToPrintStudent.this));
-        adapter = new DynamicStudentAdapter(studentList);
-        recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged(); // Notify adapter of dataset changes
-    }
-
-    private String getSelectedStudentIds() {
-        return adapter.getSelectedStudentIds();
-    }
-    // End of method to update school list recycler view
-
-
 
 
 

@@ -124,82 +124,9 @@ public class ListStudents extends AppCompatActivity {
             }
         });
 
-
-
     }
     // Main function ends here
 
-
-
-    private void fetchStudentData(String id) {
-        // Get the authorization token
-        String token = getToken();
-
-        String url = "https://id-card-backend-2.onrender.com/user/students/" + id + "?status=" + strStatus;
-
-        //List<SchoolInfo> schoolInfoList = new ArrayList<>();
-
-        RequestQueue queue = Volley.newRequestQueue(this);
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, null,
-                new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Toast.makeText(ListStudents.this, "Data Fetched Successfully", Toast.LENGTH_SHORT).show();
-                        List<DynamicStudent> studentList = new ArrayList<>();
-                        try {
-                            JSONArray studentsArray = response.getJSONArray("students");
-                            for (int i = 0; i < studentsArray.length(); i++) {
-                                JSONObject studentObject = studentsArray.getJSONObject(i);
-                                DynamicStudent student = new DynamicStudent();
-
-                                // Iterate over the keys of the JSON object
-                                Iterator<String> keys = studentObject.keys();
-                                while (keys.hasNext()) {
-                                    String key = keys.next();
-                                    // Check if the key is "avatar"
-                                    if (key.equals("avatar")) {
-                                        // Break the loop if "avatar" is encountered
-                                        break;
-                                    }
-                                    // Skip if the key is "_id"
-                                    if (key.equals("_id")) {
-                                        continue;
-                                    }
-                                    String value = studentObject.getString(key);
-                                    student.addField(key, value);
-                                }
-                                studentList.add(student);
-                            }
-                          /*  submit.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    updateRecyclerView(studentList);
-                                }
-                            });*/
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(ListStudents.this, error.toString(), Toast.LENGTH_SHORT).show();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> header = new HashMap<>();
-                header.put("Authorization", token);
-                return header;
-            }
-        };
-
-        // Add the request to the RequestQueue
-        queue.add(jsonObjectRequest);
-    }
 
     // Function to fetch schools for drop down from the api endpoint
     private void fetchUserData() {
@@ -278,14 +205,6 @@ public class ListStudents extends AppCompatActivity {
     // End of Function to fetch schools from the api endpoint
 
 
-    private void updateRecyclerView(List<DynamicStudent> studentList) {
-        recyclerView = findViewById(R.id.student_list_recycle);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(ListStudents.this));
-        adapter = new DynamicStudentAdapter(studentList);
-        recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged(); // Notify adapter of dataset changes
-    }
 
     // Method to get the token saved in local storage
 
