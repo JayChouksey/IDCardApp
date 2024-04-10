@@ -211,67 +211,8 @@
                             android:layout_marginTop="10dp"
                             android:hint="Enter Address" />
 
-                        <!-- School Code -->
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="20dp"
-                            android:text="School Code*"
-                            android:textSize="16sp" />
 
-                        <EditText
-                            android:id="@+id/editTextSchoolCode"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="number"
-                            android:background="@drawable/edittext_background"
-                            android:padding="10dp"
-                            android:layout_marginTop="10dp"
-                            android:hint="Enter School 6-digit Code" />
-
-
-
-                        <!-- Upload Photo TextView -->
-                        <TextView
-                            android:id="@+id/text_upload_photo"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Upload Photo"
-                            android:layout_marginTop="16dp"
-                            android:textSize="18sp" />
-
-                        <!-- Box to choose file -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="10dp"
-                            android:gravity="start">
-
-                            <Button
-                                android:id="@+id/btn_choose_file"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Choose File" />
-
-                            <!-- TextView for "No file chosen" -->
-                            <TextView
-                                android:id="@+id/text_no_file_chosen"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="No file chosen"
-                                android:layout_marginStart="8dp"
-                                android:layout_gravity="center_vertical" />
-
-                            <ImageView
-                                android:id="@+id/chosen_img"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_marginStart="5dp"
-                                android:layout_gravity="center_vertical"/>
-                        </LinearLayout>
-
-                        <!-- ID card data which will be shown in the card -->
+                        <!-- ID card student data which will be shown in the card -->
                         <LinearLayout
                             android:id="@+id/LinearLayoutIdCardData"
                             android:layout_width="match_parent"
@@ -281,8 +222,9 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="20dp"
-                                android:textSize="18dp"
+                                android:layout_marginTop="30dp"
+                                android:textSize="20dp"
+                                android:textStyle="bold"
                                 android:text="Select Student Field"/>
 
                             <!-- Student Name -->
@@ -290,7 +232,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
-                                android:layout_marginTop="20dp">
+                                android:layout_marginTop="10dp">
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -316,7 +258,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Father Name"
+                                    android:text="Father's Name"
                                     android:textSize="15sp"
                                     android:layout_weight="1"/>
 
@@ -337,7 +279,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Mother Name"
+                                    android:text="Mother's Name"
                                     android:textSize="15sp"
                                     android:layout_weight="1"/>
 
@@ -369,7 +311,7 @@
                                     android:layout_marginEnd="120dp"/>
                             </LinearLayout>
 
-                            <!-- Mobile -->
+                            <!-- Contact No. -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -379,7 +321,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
-                                    android:text="Mobile"
+                                    android:text="Contact No."
                                     android:textSize="15sp"/>
 
                                 <CheckBox
@@ -449,7 +391,7 @@
                                     android:layout_marginEnd="120dp"/>
                             </LinearLayout>
 
-                            <!-- Session -->
+                            <!-- Roll No. -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -458,16 +400,17 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Session"
+                                    android:text="Roll No."
                                     android:textSize="15sp"
                                     android:layout_weight="1"/>
 
                                 <CheckBox
-                                    android:id="@+id/checkBox_session"
+                                    android:id="@+id/checkBox_roll_no"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginEnd="120dp"/>
                             </LinearLayout>
+
 
                             <!-- Admission No. -->
                             <LinearLayout
@@ -489,7 +432,7 @@
                                     android:layout_marginEnd="120dp"/>
                             </LinearLayout>
 
-                            <!-- Bus No. -->
+                            <!-- Student Id -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -498,12 +441,32 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Bus No."
+                                    android:text="Student ID"
                                     android:textSize="15sp"
                                     android:layout_weight="1"/>
 
                                 <CheckBox
-                                    android:id="@+id/checkBox_bus_no"
+                                    android:id="@+id/checkBox_student_id"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
+                            <!-- Aadhar No. -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Aadhar No."
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_aadhar_no"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginEnd="120dp"/>
@@ -529,7 +492,8 @@
                                     android:layout_marginEnd="120dp"/>
                             </LinearLayout>
 
-                            <!-- Roll No. -->
+
+                            <!-- Ribbon Colour -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -538,18 +502,18 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Roll No."
+                                    android:text="Ribbon Colour"
                                     android:textSize="15sp"
                                     android:layout_weight="1"/>
 
                                 <CheckBox
-                                    android:id="@+id/checkBox_roll_no"
+                                    android:id="@+id/checkBox_ribbon_colour"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginEnd="120dp"/>
                             </LinearLayout>
 
-                            <!-- E-Mail -->
+                            <!-- Route No. -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -558,12 +522,155 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="E-Mail"
+                                    android:text="Route No."
                                     android:textSize="15sp"
                                     android:layout_weight="1"/>
 
                                 <CheckBox
-                                    android:id="@+id/checkBox_email"
+                                    android:id="@+id/checkBox_bus_no"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
+                            <!-- Mode of Transport -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Mode of Transport"
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_mode_of_transport"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+                        <!-- End of ID card student data which will be shown in the card -->
+
+                        <!-- ID card staff data which will be shown in the card -->
+                        <LinearLayout
+                            android:id="@+id/LinearLayoutSatffIdCardData"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="30dp"
+                                android:textSize="20dp"
+                                android:textStyle="bold"
+                                android:text="Select Staff Field"/>
+
+                            <!-- Staff Member Name -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginTop="10dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Name"
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_staff_name"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"
+                                    android:checked="true"/>
+                            </LinearLayout>
+
+                            <!-- Father Name -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Father's Name"
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_staff_father_name"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:checked="false"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
+                            <!-- Husband Name -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Husband's Name"
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_staff_husband_name"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
+
+                            <!-- Date of Birth -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Date of Birth"
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_staff_date_of_birth"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
+                            <!-- Qualification -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Qualification"
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_staff_qualification"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginEnd="120dp"/>
@@ -583,13 +690,13 @@
                                     android:layout_weight="1"/>
 
                                 <CheckBox
-                                    android:id="@+id/checkBox_designation"
+                                    android:id="@+id/checkBox_staff_designation"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginEnd="120dp"/>
                             </LinearLayout>
 
-                            <!-- Husband Name -->
+                            <!-- Date of Joining -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -598,18 +705,18 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Husband Name"
+                                    android:text="Date of Joining"
                                     android:textSize="15sp"
                                     android:layout_weight="1"/>
 
                                 <CheckBox
-                                    android:id="@+id/checkBox_husband_name"
+                                    android:id="@+id/checkBox_staff_doj"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginEnd="120dp"/>
                             </LinearLayout>
 
-                            <!-- Emp ID -->
+                            <!-- Type -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -618,18 +725,18 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Emp ID"
+                                    android:text="Staff Type"
                                     android:textSize="15sp"
                                     android:layout_weight="1"/>
 
                                 <CheckBox
-                                    android:id="@+id/checkBox_emp_id"
+                                    android:id="@+id/checkBox_staff_type"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginEnd="120dp"/>
                             </LinearLayout>
 
-                            <!-- Employee Name -->
+                            <!-- Address -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -638,18 +745,18 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Employee Name"
+                                    android:text="Address"
                                     android:textSize="15sp"
                                     android:layout_weight="1"/>
 
                                 <CheckBox
-                                    android:id="@+id/checkBox_employee_name"
+                                    android:id="@+id/checkBox_staff_address"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginEnd="120dp"/>
                             </LinearLayout>
 
-                            <!-- Blank1 -->
+                            <!-- Contact No. -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -658,18 +765,20 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Blank1"
-                                    android:textSize="15sp"
-                                    android:layout_weight="1"/>
+                                    android:layout_weight="1"
+                                    android:text="Contact No."
+                                    android:textSize="15sp"/>
 
                                 <CheckBox
-                                    android:id="@+id/checkBox_blank1"
+                                    android:id="@+id/checkBox_staff_mobile"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginEnd="120dp"/>
                             </LinearLayout>
 
-                            <!-- Blank2 -->
+
+
+                            <!-- Aadhar No. -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -678,33 +787,200 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Blank2"
+                                    android:text="UID No."
                                     android:textSize="15sp"
                                     android:layout_weight="1"/>
 
                                 <CheckBox
-                                    android:id="@+id/checkBox_blank2"
+                                    android:id="@+id/checkBox_staff_aadhar_no"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginEnd="120dp"/>
                             </LinearLayout>
+
+                            <!-- E-mail -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="E-mail"
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_staff_email"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
+                            <!-- Staff Id -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Staff ID"
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_staff_id"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
+                            <!-- UDISE Code -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="UDISE Code"
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_staff_udise_code"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
+                            <!-- Office Name -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Office Name"
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_staff_office"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
+                            <!-- Blood Group -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Blood Group"
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_staff_blood_group"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
+                            <!-- Dispatch No. -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Dispatch No."
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_staff_dispatch_no"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
+                            <!-- Date of Issue -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Date of Issue"
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_staff_doi"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
+                            <!-- IHRMS No. -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="IHRMS No."
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_staff_ihrms_no"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
+                            <!-- Belt No -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Belt No."
+                                    android:textSize="15sp"
+                                    android:layout_weight="1"/>
+
+                                <CheckBox
+                                    android:id="@+id/checkBox_staff_belt_no"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="120dp"/>
+                            </LinearLayout>
+
 
                         </LinearLayout>
-                        <!-- End of ID card data which will be shown in the card -->
-
-                        <!-- Status of School drop down -->
-                        <!--<com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Status*"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
-                            <AutoCompleteTextView
-                                android:id="@+id/status_dropdown"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="none"/>
-                        </com.google.android.material.textfield.TextInputLayout>-->
-                        <!-- End of Status of School drop down -->
+                        <!-- End of ID card staff data which will be shown in the card -->
 
                         <LinearLayout
                             android:layout_width="match_parent"

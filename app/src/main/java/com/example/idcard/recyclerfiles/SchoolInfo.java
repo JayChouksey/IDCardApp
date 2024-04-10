@@ -9,25 +9,26 @@ public class SchoolInfo {
     private String email;
     private String schoolMobile;
     private String schoolAddress;
-    private String schoolCode;
     private String numberOfStudents;
     private String status;
     private String created;
     private String allowedFields;
+    private String allowedFieldsStaff;
     private String id;
 
     public SchoolInfo(String distributorName, String schoolName, String email, String schoolMobile, String schoolAddress,
-                      String schoolCode, String numberOfStudents, String status, String created, String allowedFields, String id) {
+                      String numberOfStudents, String status, String created, String allowedFields,
+                      String allowedFieldsStaff, String id) {
         this.distributorName = distributorName;
         this.schoolName = schoolName;
         this.email = email;
         this.schoolMobile = schoolMobile;
         this.schoolAddress = schoolAddress;
-        this.schoolCode = schoolCode;
         this.numberOfStudents = numberOfStudents;
         this.status = status;
         this.created = created;
         this.allowedFields = allowedFields;
+        this.allowedFieldsStaff = allowedFieldsStaff;
         this.id = id;
     }
 
@@ -51,10 +52,6 @@ public class SchoolInfo {
         return schoolAddress;
     }
 
-    public String getSchoolCode() {
-        return schoolCode;
-    }
-
     public String getNumberOfStudents() {
         return numberOfStudents;
     }
@@ -76,4 +73,7 @@ public class SchoolInfo {
     }
 
 
+    public String getAllowedFieldsStaff() {
+        return allowedFieldsStaff;
+    }
 }

@@ -1,8 +1,12 @@
 package com.example.idcard;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -13,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +29,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -31,11 +37,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.idcard.api.VolleyMultipartRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,15 +55,24 @@ public class AddStudent extends AppCompatActivity {
     List<String> schoolNames = new ArrayList<>(); // List to store school names
     List<String> schoolId = new ArrayList<>(); // List to store schoolId
 
-    AutoCompleteTextView autoCompleteSchool;
-    ArrayAdapter<String> adapterSchool;
-    TextView textView; // to test
-    Button buttonAddStudent;
-    Button saveButton;
+    String [] role = {"Student", "Staff"};
+    String strRole = "";
 
-    private HashMap<String, String> fieldValueMap = new HashMap<>();
+    AutoCompleteTextView autoCompleteSchool, autoCompleteRole;
+    ArrayAdapter<String> adapterSchool, adapterRole;
+    TextView textView; // to test
+    Button buttonAdd;
+    Button buttonChooseImage;
+    TextView textNoFileChosen;
+    ImageView imgChosen;
+    Bitmap bitmap;
+    Button saveButton, resetButton, cancelButton;
+
+    private HashMap<String, String> fieldValueMap = new HashMap<>(); // for Student
+    private HashMap<String, String> fieldValueMapStaff = new HashMap<>(); // for Staff
 
     LinearLayout dynamicLayout; // Dynamic layout for add students data
+    LinearLayout buttonLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,36 +82,91 @@ public class AddStudent extends AppCompatActivity {
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
 
+        // components initialization
+        saveButton = findViewById(R.id.saveButton);
+        resetButton = findViewById(R.id.resetButton);
+        cancelButton = findViewById(R.id.cancelButton);
+        buttonChooseImage = findViewById(R.id.chooseImageButton);
+        textNoFileChosen = findViewById(R.id.noFileChosenTextView);
+        imgChosen = findViewById(R.id.imageChosen);
 
         // School Dropdown
         autoCompleteSchool = findViewById(R.id.school_dropdown);
         fetchUserData();
 
-/*        saveButton = new Button(AddStudent.this); // Initialize saveButton
-        saveButton.setId(View.generateViewId()); // Giving id to the button
-        saveButton = findViewById(saveButton.getId()); // Retrieve button using its ID*/
-
 
         // Add student details dynamically
-        buttonAddStudent = findViewById(R.id.buttonAddStudent);
+        buttonAdd = findViewById(R.id.buttonAddStudent);
         dynamicLayout = findViewById(R.id.dynamicLayout);
+        // Find the buttonLayout
+        buttonLayout = findViewById(R.id.buttonLayout);
+
+        // ----------------------------------------------------------------------------------------------------------------
+
+        // Button Actions
+
         // It will run when no school is selected from the dropdown
-        buttonAddStudent.setOnClickListener(new View.OnClickListener() {
+        buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(AddStudent.this, "Select Any School", Toast.LENGTH_SHORT).show();
             }
         });
 
-        textView = findViewById(R.id.test);
+        buttonChooseImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chooseImageFromGallery();
+            }
+        });
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetFields();
+                imgChosen.setImageBitmap(null);
+                textNoFileChosen.setText("No file chosen");
+            }
+        });
 
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        // End of Button Actions
+
+        // ----------------------------------------------------------------------------------------------------------------
+
+
+        // Role Dropdown
+        autoCompleteRole = findViewById(R.id.role_dropdown);
+        adapterRole = new ArrayAdapter<String>(this,R.layout.list_item,role);
+        autoCompleteRole.setAdapter(adapterRole);
+
+        autoCompleteRole.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Switch case to set strStatus based on selected item
+                switch (position) {
+                    case 0:
+                        strRole = "Student";
+                        buttonAdd.setText("Add Student");
+                        break;
+                    case 1:
+                        strRole = "Staff";
+                        buttonAdd.setText("Add Staff");
+                        break;
+                }
+            }
+        });
 
     }
     // Main function ends
 
     // ------------------------------------------------------------------------------------------------------------------------
 
-    // Method to fetch required fields
+    // Method to fetch required fields students
     private void fetchRequiredFields(String id) {
         String url = "https://id-card-backend-2.onrender.com/user/school/requiredfields/" + id;
 
@@ -109,7 +182,7 @@ public class AddStudent extends AppCompatActivity {
                             // Parse the JSON response
                             String requiredFields = response.getString("requiredFields");
 
-                            buttonAddStudent.setOnClickListener(new View.OnClickListener() {
+                            buttonAdd.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     String[] fields = requiredFields.split(",");
@@ -118,17 +191,17 @@ public class AddStudent extends AppCompatActivity {
                                             case "Student Name":
                                                 addField("Student Name", "Enter Student name", "studentName");
                                                 break;
-                                            case "Father Name":
-                                                addField("Father Name", "Enter Father name", "fatherName");
+                                            case "Father's Name":
+                                                addField("Father's Name", "Enter Father name", "fatherName");
                                                 break;
-                                            case "Mother Name":
-                                                addField("Mother Name", "Enter Mother Name", "motherName");
+                                            case "Mother's Name":
+                                                addField("Mother's Name", "Enter Mother Name", "motherName");
                                                 break;
                                             case "Date of Birth":
                                                 addField("Date of Birth", "Enter Date of Birth", "dob");
                                                 break;
-                                            case "Mobile":
-                                                addField("Mobile", "Enter Mobile", "contact");
+                                            case "Contact No.":
+                                                addField("Contact No.", "Enter Contact No.", "contact");
                                                 break;
                                             case "Address":
                                                 addField("Address", "Enter Address", "address");
@@ -139,50 +212,41 @@ public class AddStudent extends AppCompatActivity {
                                             case "Section":
                                                 addField("Section", "Enter Section", "section");
                                                 break;
+                                            case "Roll No.":
+                                                addField("Roll No.", "Enter Roll No.", "rollNo");
+                                                break;
                                             case "Admission No.":
                                                 addField("Admission No.", "Enter Admission No.", "admissionNo");
                                                 break;
-                                            case "Bus No.":
-                                                addField("Bus No.", "Enter Bus No.", "busNo");
+                                            case "Student ID":
+                                                addField("Student ID", "Enter Student ID", "studentID");
+                                                break;
+                                            case "Aadhar No.":
+                                                addField("Aadhar No.", "Enter Aadhar No.", "aadharNo");
                                                 break;
                                             case "Blood Group":
                                                 addField("Blood Group", "Enter Blood Group", "bloodGroup");
                                                 break;
-                                            case "Roll No.":
-                                                addField("Roll No.", "Enter Roll No.", "rollNo");
+                                            case "Ribbon Colour":
+                                                addField("Ribbon Colour", "Enter Ribbon Colour", "ribbonColour");
                                                 break;
-                                            case "E-Mail":
-                                                addField("E-Mail", "Enter E-Mail", "email");
+                                            case "Route No.":
+                                                addField("Route No.", "Enter Route No.", "routeNo");
                                                 break;
-                                            case "Designation":
-                                                addField("Designation", "Enter Designation", "designation");
+                                            case "Mode of Transport":
+                                                addField("Mode of Transport", "Enter Mode of Transport", "modeOfTransport");
                                                 break;
-                                            case "Husband Name":
-                                                addField("Husband Name", "Enter Husband Name", "husbandName");
-                                                break;
-                                            case "Emp ID":
-                                                addField("Emp ID", "Enter Emp ID", "empId");
-                                                break;
-                                            case "Employee Name":
-                                                addField("Employee Name", "Enter Employee Name", "employeeName");
-                                                break;
-                                            // Add cases for other required fields
                                         }
                                     }
-
-                                    // Add the dynamic view for "Upload Photo"
-                                    addUploadPhotoView();
-
-                                    // Add LinearLayout for buttons
-                                    addButtonsLayout();
-
                                     // Disable the button after fields are added
-                                   buttonAddStudent.setEnabled(false);
+                                    // Change the visibility of buttonLayout to VISIBLE
+                                   buttonLayout.setVisibility(View.VISIBLE);
+                                   buttonAdd.setEnabled(false);
 
-                                    textView.setOnClickListener(new View.OnClickListener() {
+                                    saveButton.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
-                                            textView.setText("Loading...");
+                                            saveButton.setText("Saving...");
                                             addStudentToDatabase(id,requiredFields);
                                         }
                                     });
@@ -214,7 +278,136 @@ public class AddStudent extends AppCompatActivity {
         // Add the request to the RequestQueue
         queue.add(jsonObjectRequest);
     }
-    // End of Method to fetch required fields
+    // End of Method to fetch required fields students
+
+    // ------------------------------------------------------------------------------------------------------------------------
+
+    // Method to fetch required fields students
+    private void fetchRequiredFieldsStaff(String id) {
+        String url = "https://id-card-backend-2.onrender.com/user/school/requiredfields/" + id;
+
+        // Instantiate the RequestQueue
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        // Create the request object
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            // Parse the JSON response
+                            String requiredFieldsStaff = response.getString("requiredFieldsStaff");
+
+                            buttonAdd.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    String[] fields = requiredFieldsStaff.split(",");
+                                    for (String field : fields) {
+                                        switch (field.trim()) {
+                                            case "Name":
+                                                addFieldStaff("Name", "Enter name", "name");
+                                                break;
+                                            case "Father's Name":
+                                                addFieldStaff("Father's Name", "Enter Father's name", "fatherName");
+                                                break;
+                                            case "Husband's Name":
+                                                addFieldStaff("Husband's Name", "Enter Husband's Name", "husbandName");
+                                                break;
+                                            case "Date of Birth":
+                                                addFieldStaff("Date of Birth", "Enter Date of Birth", "dob");
+                                                break;
+                                            case "Qualification":
+                                                addFieldStaff("Qualification", "Enter Qualification", "qualification");
+                                                break;
+                                            case "Designation":
+                                                addFieldStaff("Designation", "Enter Designation", "designation");
+                                                break;
+                                            case "Date of Joining":
+                                                addFieldStaff("Date of Joining", "Enter Date of Joining", "doj");
+                                                break;
+                                            case "Staff Type":
+                                                addFieldStaff("Staff Type", "Enter Staff Type", "staffType");
+                                                break;
+                                            case "Address":
+                                                addFieldStaff("Address", "Enter Address", "address");
+                                                break;
+                                            case "Contact No.":
+                                                addFieldStaff("Contact No.", "Enter Contact No.", "contact");
+                                                break;
+                                            case "UID No.":
+                                                addFieldStaff("UID No.", "Enter UID No.", "UIDNo");
+                                                break;
+                                            case "E-mail":
+                                                addFieldStaff("E-mail", "Enter Email", "email");
+                                                break;
+                                            case "Staff ID":
+                                                addFieldStaff("Staff ID", "Enter Staff ID", "staffID");
+                                                break;
+                                            case "USIDE Code":
+                                                addFieldStaff("USIDE Code", "Enter USIDE Code", "USIDECode");
+                                                break;
+                                            case "Office Name":
+                                                addFieldStaff("Office Name", "Enter Office Name", "officeName");
+                                                break;
+                                            case "Blood Group":
+                                                addFieldStaff("Blood Group", "Enter Blood Group", "bloodGroup");
+                                                break;
+                                            case "Dispatch No.":
+                                                addFieldStaff("Address", "Enter Address", "address");
+                                                break;
+                                            case "Date of Issue":
+                                                addFieldStaff("Date of Issue", "Enter Date of Issue", "doi");
+                                                break;
+                                            case "IHRMS No.":
+                                                addFieldStaff("IHRMS No.", "Enter IHRMS No.", "IHRMSNo");
+                                                break;
+                                            case "Belt No.":
+                                                addFieldStaff("Belt No.", "Enter Belt No.", "beltNo");
+                                                break;
+                                        }
+                                    }
+                                    // Disable the button after fields are added
+                                    // Change the visibility of buttonLayout to VISIBLE
+                                    buttonLayout.setVisibility(View.VISIBLE);
+                                    buttonAdd.setEnabled(false);
+
+                                    saveButton.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            saveButton.setText("Saving...");
+                                            addStaffToDatabase(id,requiredFieldsStaff);
+                                        }
+                                    });
+                                }
+                            });
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Toast.makeText(AddStudent.this, "Error parsing JSON response", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                Toast.makeText(AddStudent.this, "Error fetching required fields", Toast.LENGTH_SHORT).show();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                // Pass your headers here
+                Map<String, String> headers = new HashMap<>();
+                // Add any required headers, such as authorization token, if needed
+                headers.put("Authorization", getToken());
+                return headers;
+            }
+        };
+
+        // Add the request to the RequestQueue
+        queue.add(jsonObjectRequest);
+    }
+
+    // End of Method to fetch required fields students
 
     // ------------------------------------------------------------------------------------------------------------------------
 
@@ -276,115 +469,7 @@ public class AddStudent extends AppCompatActivity {
 
     // -------------------------------------------------------------------------------------------------------------------------
 
-    // Method to add student to the database
-    /*private void addStudentToDatabase(String id, String requiredFields) {
-        // Get the authorization token
-        String token = getToken();
-
-        String url = "https://id-card-backend-2.onrender.com/user/registration/student/" + id;
-
-        // Create JSON object for student data
-        JSONObject studentData = new JSONObject();
-        try {
-            // Split the required fields string to get the list of fields
-            String[] fields = requiredFields.split(",");
-
-            // Add dynamic fields data to the JSON object
-            for (String field : fields) {
-                String trimmedField = field.trim();
-                switch (trimmedField) {
-                    case "Student Name":
-                        String studentName = getEditTextValue("Student Name");
-                        studentData.put("name", studentName);
-                        break;
-                    case "Father Name":
-                        String fatherName = getEditTextValue("Father Name");
-                        studentData.put("fatherName", fatherName);
-                        break;
-                    case "Mother Name":
-                        String motherName = getEditTextValue("Mother Name");
-                        studentData.put("motherName", motherName);
-                        break;
-                    case "Date of Birth":
-                        String dob = getEditTextValue("Date of Birth");
-                        studentData.put("dob", dob);
-                        break;
-                    case "Mobile":
-                        String mobile = getEditTextValue("Mobile");
-                        studentData.put("contact", mobile);
-                        break;
-                    case "Address":
-                        String address = getEditTextValue("Address");
-                        studentData.put("address", address);
-                        break;
-                    case "Class":
-                        String studentClass = getEditTextValue("Class");
-                        studentData.put("class", studentClass);
-                        break;
-                    case "Section":
-                        String section = getEditTextValue("Section");
-                        studentData.put("section", section);
-                        break;
-                    case "Admission No.":
-                        String admissionNo = getEditTextValue("Admission No.");
-                        studentData.put("admissionNo", admissionNo);
-                        break;
-                    case "Bus No.":
-                        String busNo = getEditTextValue("Bus No.");
-                        studentData.put("busNo", busNo);
-                        break;
-                    case "Blood Group":
-                        String bloodGroup = getEditTextValue("Blood Group");
-                        studentData.put("bloodGroup", bloodGroup);
-                        break;
-                    case "Roll No.":
-                        String rollNo = getEditTextValue("Roll No.");
-                        studentData.put("rollNo", rollNo);
-                        break;
-                    // Add cases for other required fields
-                }
-            }
-
-            // Add other required fields here if needed
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        // Make a POST request to add the student to the database
-        RequestQueue queue = Volley.newRequestQueue(this);
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, studentData,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Toast.makeText(AddStudent.this, "Student added successfully", Toast.LENGTH_SHORT).show();
-                        // Handle successful response
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //Toast.makeText(AddStudent.this, "Error adding student", Toast.LENGTH_SHORT).show();
-                Toast.makeText(AddStudent.this, new String(error.networkResponse.data), Toast.LENGTH_SHORT).show();
-                error.printStackTrace();
-                // Handle error response
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() {
-                // Pass your headers here
-                Map<String, String> headers = new HashMap<>();
-                // Add any required headers, such as authorization token, if needed
-                headers.put("Authorization", token);
-                return headers;
-            }
-        };
-
-        // Add the request to the RequestQueue
-        queue.add(jsonObjectRequest);
-    }*/
-
+    // Function to add student to database
     private void addStudentToDatabase(String id, String requiredFields) {
         // Get the authorization token
         String token = getToken();
@@ -403,16 +488,16 @@ public class AddStudent extends AppCompatActivity {
                 case "Student Name":
                     params.put("name", fieldValueMap.get("studentName"));
                     break;
-                case "Father Name":
+                case "Father's Name":
                     params.put("fatherName", fieldValueMap.get("fatherName"));
                     break;
-                case "Mother Name":
+                case "Mother's Name":
                     params.put("motherName", fieldValueMap.get("motherName"));
                     break;
                 case "Date of Birth":
                     params.put("dob", fieldValueMap.get("dob"));
                     break;
-                case "Mobile":
+                case "Contact No.":
                     params.put("contact", fieldValueMap.get("contact"));
                     break;
                 case "Address":
@@ -424,19 +509,30 @@ public class AddStudent extends AppCompatActivity {
                 case "Section":
                     params.put("section", fieldValueMap.get("section"));
                     break;
+                case "Roll No.":
+                    params.put("rollNo", fieldValueMap.get("rollNo"));
+                    break;
                 case "Admission No.":
                     params.put("admissionNo", fieldValueMap.get("admissionNo"));
                     break;
-                case "Bus No.":
-                    params.put("busNo", fieldValueMap.get("busNo"));
+                case "Student ID":
+                    params.put("studentID", fieldValueMap.get("studentID"));
+                    break;
+                case "Aadhar No.":
+                    params.put("aadharNo", fieldValueMap.get("aadharNo"));
                     break;
                 case "Blood Group":
                     params.put("bloodGroup", fieldValueMap.get("bloodGroup"));
                     break;
-                case "Roll No.":
-                    params.put("rollNo", fieldValueMap.get("rollNo"));
+                case "Ribbon Colour":
+                    params.put("ribbonColour", fieldValueMap.get("ribbonColour"));
                     break;
-                // Add cases for other required fields
+                case "Route No.":
+                    params.put("routeNo", fieldValueMap.get("routeNo"));
+                    break;
+                case "Mode of Transport":
+                    params.put("modeOfTransport", fieldValueMap.get("modeOfTransport"));
+                    break;
             }
         }
 
@@ -446,11 +542,11 @@ public class AddStudent extends AppCompatActivity {
             return;
         }
 
-        // Create the string request
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, apiEndpoint,
-                new Response.Listener<String>() {
+        // Create the VolleyMultipartRequest
+        VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, apiEndpoint,
+                new Response.Listener<NetworkResponse>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(NetworkResponse response) {
                         Toast.makeText(AddStudent.this, "Student added successfully", Toast.LENGTH_SHORT).show();
                         // will change later
                         textView.setText("Add Student");
@@ -461,7 +557,7 @@ public class AddStudent extends AppCompatActivity {
                 // Display error message from the server
                 if (error.networkResponse != null && error.networkResponse.data != null) {
                     String errorMessage = new String(error.networkResponse.data);
-                    Toast.makeText(AddStudent.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddStudent.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(AddStudent.this, "Error adding student", Toast.LENGTH_SHORT).show();
                 }
@@ -471,6 +567,17 @@ public class AddStudent extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 // Pass parameters as form data
+                return params;
+            }
+
+            /*
+             * Adding photo
+             */
+            @Override
+            public Map<String, DataPart> getByteData() {
+                Map<String, DataPart> params = new HashMap<>();
+                long imagename = System.currentTimeMillis();
+                params.put("file", new DataPart(imagename + ".jpeg", getFileDataFromDrawable(bitmap)));
                 return params;
             }
 
@@ -484,13 +591,152 @@ public class AddStudent extends AppCompatActivity {
         };
 
         // Add the request to the RequestQueue
-        Volley.newRequestQueue(this).add(stringRequest);
+        Volley.newRequestQueue(this).add(volleyMultipartRequest);
     }
 
+    // End of Function to add student to database
 
-    // Method to get the text value of an EditText field by label
-    // Updated code
+    // ------------------------------------------------------------------------------------------------------------------------
 
+    // Function to add student to database
+    private void addStaffToDatabase(String id, String requiredFields) {
+        // Get the authorization token
+        String token = getToken();
+
+        // Construct the API endpoint URL
+        String apiEndpoint = "https://id-card-backend-2.onrender.com/user/registration/staff/" + id; // change url
+
+        // Create parameters for the POST request
+        Map<String, String> params = new HashMap<>();
+
+        // Add other required fields dynamically
+        String[] fields = requiredFields.split(",");
+        for (String field : fields) {
+            String trimmedField = field.trim();
+            switch (trimmedField) {
+                case "Name":
+                    params.put("name", fieldValueMapStaff.get("name"));
+                    break;
+                case "Father's Name":
+                    params.put("fatherName", fieldValueMapStaff.get("fatherName"));
+                    break;
+                case "Husband's Name":
+                    params.put("husbandName", fieldValueMapStaff.get("husbandName"));
+                    break;
+                case "Date of Birth":
+                    params.put("dob", fieldValueMapStaff.get("dob"));
+                    break;
+                case "Qualification":
+                    params.put("qualification", fieldValueMapStaff.get("qualification"));
+                    break;
+                case "Designation":
+                    params.put("designation", fieldValueMapStaff.get("designation"));
+                    break;
+                case "Date of Joining":
+                    params.put("doj", fieldValueMapStaff.get("doj"));
+                    break;
+                case "Staff Type":
+                    params.put("staffType", fieldValueMapStaff.get("staffType"));
+                    break;
+                case "Address":
+                    params.put("address", fieldValueMapStaff.get("address"));
+                    break;
+                case "Contact No.":
+                    params.put("contact", fieldValueMapStaff.get("contact"));
+                    break;
+                case "UID No.":
+                    params.put("uid", fieldValueMapStaff.get("UIDNo"));
+                    break;
+                case "E-mail":
+                    params.put("email", fieldValueMapStaff.get("email"));
+                    break;
+                case "Staff ID":
+                    params.put("staffID", fieldValueMapStaff.get("staffID"));
+                    break;
+                case "UDISE Code":
+                    params.put("udiseCode", fieldValueMapStaff.get("UDISECode"));
+                    break;
+                case "Office Name":
+                    params.put("schoolName", fieldValueMapStaff.get("officeName"));
+                    break;
+                case "Blood Group":
+                    params.put("bloodGroup", fieldValueMapStaff.get("bloodGroup"));
+                    break;
+                case "Dispatch No.":
+                    params.put("dispatchNo", fieldValueMapStaff.get("dispatchNo"));
+                    break;
+                case "Date of Issue":
+                    params.put("doi", fieldValueMapStaff.get("doi"));
+                    break;
+                case "IHRMS No.":
+                    params.put("ihrmsNo", fieldValueMapStaff.get("IHRMSNo"));
+                    break;
+                case "Belt No.":
+                    params.put("beltNo", fieldValueMapStaff.get("beltNo"));
+                    break;
+            }
+
+        }
+
+        // Make sure all required fields are provided
+       /* if (params.size() < requiredFields.split(",").length) {
+            Toast.makeText(this, "Please fill all required fields", Toast.LENGTH_SHORT).show();
+            return;
+        }*/
+
+        // Create the VolleyMultipartRequest
+        VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, apiEndpoint,
+                new Response.Listener<NetworkResponse>() {
+                    @Override
+                    public void onResponse(NetworkResponse response) {
+                        Toast.makeText(AddStudent.this, "Student added successfully", Toast.LENGTH_SHORT).show();
+                        // will change later
+                        textView.setText("Add Student");
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Display error message from the server
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    String errorMessage = new String(error.networkResponse.data);
+                    Toast.makeText(AddStudent.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(AddStudent.this, "Error adding student", Toast.LENGTH_SHORT).show();
+                }
+                // Handle error response
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                // Pass parameters as form data
+                return params;
+            }
+
+            /*
+             * Adding photo
+             */
+            @Override
+            public Map<String, DataPart> getByteData() {
+                Map<String, DataPart> params = new HashMap<>();
+                long imagename = System.currentTimeMillis();
+                params.put("file", new DataPart(imagename + ".jpeg", getFileDataFromDrawable(bitmap)));
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                // Pass your headers here
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", token);
+                return headers;
+            }
+        };
+
+        // Add the request to the RequestQueue
+        Volley.newRequestQueue(this).add(volleyMultipartRequest);
+    }
+
+    // End of Function to add student to database
 
     // ------------------------------------------------------------------------------------------------------------------------
 
@@ -510,7 +756,13 @@ public class AddStudent extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String item = parent.getItemAtPosition(position).toString();
                 //Toast.makeText(getApplicationContext(),"Item: "+idArray[position],Toast.LENGTH_SHORT).show();
-                fetchRequiredFields(idArray[position]);
+                if(strRole.equals("Student")){
+                    fetchRequiredFields(idArray[position]);
+                }
+                else{
+                    fetchRequiredFieldsStaff(idArray[position]);
+                }
+
             }
         });
     }
@@ -519,8 +771,9 @@ public class AddStudent extends AppCompatActivity {
 
     // ------------------------------------------------------------------------------------------------------------------------
 
-    // updated addField
 
+
+    // Add Field function
     private void addField(String label, String hint, String fieldIdentifier) {
         // Create a new TextView dynamically for label
         TextView textView = new TextView(AddStudent.this);
@@ -560,8 +813,7 @@ public class AddStudent extends AppCompatActivity {
         dynamicLayout.addView(editText);
     }
 
-    // dynamic addfield function
-    /*private void addField(String label, String hint) {
+    private void addFieldStaff(String label, String hint, String fieldIdentifier) {
         // Create a new TextView dynamically for label
         TextView textView = new TextView(AddStudent.this);
         textView.setLayoutParams(new LinearLayout.LayoutParams(
@@ -580,132 +832,27 @@ public class AddStudent extends AppCompatActivity {
         editText.setPadding(30, 30, 30, 30);
         editText.setHint(hint);
 
+        // Add a text change listener to update the HashMap when the text changes
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Update the HashMap with the current value of the EditText
+                fieldValueMapStaff.put(fieldIdentifier, s.toString());
+            }
+        });
+
         // Add the TextView and EditText to the layout container
         dynamicLayout.addView(textView);
         dynamicLayout.addView(editText);
-    }*/
-
-    private void addUploadPhotoView() {
-        // Create TextView for "Upload Photo"
-        TextView uploadPhotoTextView = new TextView(AddStudent.this);
-        uploadPhotoTextView.setText("Upload Photo");
-        uploadPhotoTextView.setTextSize(18);
-        LinearLayout.LayoutParams uploadPhotoParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        uploadPhotoParams.setMargins(0, dpToPx(16), 0, 0); // Convert dp to pixels
-        uploadPhotoTextView.setLayoutParams(uploadPhotoParams);
-
-        // Create LinearLayout for "Choose File" button and "No file chosen" TextView
-        LinearLayout fileChooseLayout = new LinearLayout(AddStudent.this);
-        fileChooseLayout.setOrientation(LinearLayout.HORIZONTAL);
-        LinearLayout.LayoutParams fileChooseLayoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        fileChooseLayoutParams.setMargins(0, dpToPx(10), 0, 0); // Convert dp to pixels
-        fileChooseLayout.setLayoutParams(fileChooseLayoutParams);
-
-        // Create "Choose File" button
-        Button chooseFileButton = new Button(AddStudent.this);
-        chooseFileButton.setText("Choose File");
-
-        // Create "No file chosen" TextView
-        TextView noFileChosenTextView = new TextView(AddStudent.this);
-        noFileChosenTextView.setText("No file chosen");
-        LinearLayout.LayoutParams noFileChosenParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        noFileChosenParams.setMargins(dpToPx(8), 0, 0, 0); // Convert dp to pixels
-        noFileChosenTextView.setLayoutParams(noFileChosenParams);
-
-        // Add views to the fileChooseLayout
-        fileChooseLayout.addView(chooseFileButton);
-        fileChooseLayout.addView(noFileChosenTextView);
-
-        // Add views to the parent layout
-        dynamicLayout.addView(uploadPhotoTextView);
-        dynamicLayout.addView(fileChooseLayout);
     }
 
-    private void addButtonsLayout() {
-        // Create LinearLayout for buttons
-        LinearLayout buttonLayout = new LinearLayout(AddStudent.this);
-        buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
-        LinearLayout.LayoutParams buttonLayoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        buttonLayoutParams.setMargins(0, dpToPx(20), 0, dpToPx(20)); // Convert dp to pixels
-        buttonLayout.setLayoutParams(buttonLayoutParams);
-        buttonLayout.setGravity(Gravity.CENTER);
-
-
-        // Create Save Button
-        saveButton = new Button(AddStudent.this);
-        saveButton.setText("Save");
-        LinearLayout.LayoutParams saveButtonParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        saveButtonParams.setMargins(dpToPx(10), 0, dpToPx(0), 0); // Set margins in pixels
-        saveButton.setLayoutParams(saveButtonParams);
-        saveButton.setBackground(getResources().getDrawable(R.drawable.button_background));
-        saveButton.setPadding(dpToPx(10), dpToPx(5), dpToPx(10), dpToPx(5)); // Convert dp to pixels
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-        buttonLayout.addView(saveButton);
-
-        // Create Reset Button
-        Button resetButton = new Button(AddStudent.this);
-        resetButton.setText("Reset");
-        LinearLayout.LayoutParams resetButtonParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        resetButtonParams.setMargins(dpToPx(10), 0, dpToPx(0), 0); // Set margins in pixels
-        resetButton.setLayoutParams(resetButtonParams);
-        resetButton.setBackground(getResources().getDrawable(R.drawable.button_background));
-        resetButton.setPadding(dpToPx(10), dpToPx(5), dpToPx(10), dpToPx(5)); // Convert dp to pixels
-        resetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle Reset button click
-                resetFields();
-                // image and it's text is remaining
-            }
-        });
-        buttonLayout.addView(resetButton);
-        // Create Cancel Button
-
-        Button cancelButton = new Button(AddStudent.this);
-        cancelButton.setText("Cancel");
-        LinearLayout.LayoutParams cancelButtonParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        cancelButtonParams.setMargins(dpToPx(10), 0, dpToPx(0), 0); // Set margins in pixels
-        cancelButton.setLayoutParams(cancelButtonParams);
-        cancelButton.setBackground(getResources().getDrawable(R.drawable.button_background));
-        cancelButton.setPadding(dpToPx(10), dpToPx(5), dpToPx(10), dpToPx(5)); // Convert dp to pixels
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle Cancel button click
-                finish();
-            }
-        });
-        buttonLayout.addView(cancelButton);
-
-        // Add LinearLayout to the parent layout
-        dynamicLayout.addView(buttonLayout);
-    }
+    // End of Add Field function
 
     // To reset all the fields
     private void resetFields() {
@@ -721,14 +868,44 @@ public class AddStudent extends AppCompatActivity {
     }
 
 
+    // -------------------------------------------------------------------------------------------------------------------------------
 
-    // -----------------------------------------------------------------------------------------------------------------------
-    // Method to convert dp to pixel
-    private int dpToPx(int dp) {
-        float density = getResources().getDisplayMetrics().density;
-        return Math.round((float) dp * density);
+    // Image upload functions
+
+    private void chooseImageFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        //startActivityForResult(intent, REQUEST_CODE_IMAGE_PICKER);
+        startActivityForResult(intent, 100);
     }
-    // Method to convert dp to pixel
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
+
+            //getting the image Uri
+            Uri imageUri = data.getData();
+            try {
+                //getting bitmap object from uri
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+
+                //displaying selected image to imageview
+                imgChosen.setImageBitmap(bitmap);
+                textNoFileChosen.setText("");
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public byte[] getFileDataFromDrawable(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    // End of Image upload functions
 
     // -----------------------------------------------------------------------------------------------------------------------
 

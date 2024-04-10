@@ -102,11 +102,8 @@ public class SchoolList extends AppCompatActivity {
                                 String id = schoolObject.getString("_id");
                                 String name = schoolObject.getString("name");
                                 String email = schoolObject.getString("email");
-                                int contact = schoolObject.getInt("contact");
-                                String contactStr = Integer.toString(contact);
+                                String contactStr = schoolObject.getString("contact");
                                 String address = schoolObject.getString("address");
-                                int code = schoolObject.getInt("code");
-                                String codeStr = Integer.toString(code);
                                 String studentNumber = Integer.toString(schoolObject.getInt("studentCount"));
                                 boolean isActive = schoolObject.getBoolean("isActive");
                                 String status = isActive ? "Active" : "Blocked";
@@ -122,13 +119,19 @@ public class SchoolList extends AppCompatActivity {
                                 }
                                 String requiredFields = requiredFieldsBuilder.toString();
 
-                                // Get the logo URL
-                                JSONObject logoObject = schoolObject.getJSONObject("logo");
-                                String logoUrl = logoObject.getString("url");
+                                JSONArray requiredFieldsStaffArray = schoolObject.getJSONArray("requiredFieldsStaff");
+                                StringBuilder requiredFieldsStaffBuilder = new StringBuilder();
+                                for (int j = 0; j < requiredFieldsStaffArray.length(); j++) {
+                                    requiredFieldsStaffBuilder.append(requiredFieldsStaffArray.getString(j));
+                                    if (j < requiredFieldsStaffArray.length() - 1) {
+                                        requiredFieldsStaffBuilder.append(", ");
+                                    }
+                                }
+                                String requiredFieldsStaff = requiredFieldsStaffBuilder.toString();
 
                                 // Create a SchoolInfo object and add it to the list
-                                SchoolInfo schoolInfo = new SchoolInfo(distributorName, name, email, contactStr, address, codeStr,
-                                        studentNumber, status, date, requiredFields, id);
+                                SchoolInfo schoolInfo = new SchoolInfo(distributorName, name, email, contactStr, address,
+                                        studentNumber, status, date, requiredFields, requiredFieldsStaff, id);
 
 
                                 schoolInfoList.add(schoolInfo);

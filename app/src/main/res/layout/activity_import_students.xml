@@ -105,9 +105,23 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="Import Student"
+                            android:text="Import Student(will check staff)"
                             android:textSize="24sp"
                             android:textStyle="bold" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="20dp"
+                            android:hint="Select Role*">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/role_dropdown"
+                                android:layout_width="match_parent"
+                                android:layout_height="61dp"
+                                android:inputType="none" />
+                        </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -123,12 +137,14 @@
                                 android:inputType="none" />
                         </com.google.android.material.textfield.TextInputLayout>
 
+
                         <!-- Upload Excel File TextView -->
                         <TextView
                             android:id="@+id/text_upload_photo"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Upload Excel File"
+                            android:textStyle="bold"
                             android:layout_marginTop="16dp"
                             android:textSize="18sp" />
 
@@ -164,7 +180,42 @@
                             android:layout_marginTop="20dp"
                             android:layout_marginBottom="20dp"
                             android:background="@drawable/button_background"
-                            android:text="Add Students" />
+                            android:text="Upload Excel" />
+
+                        <!-- Box to choose images -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="10dp"
+                            android:gravity="start">
+
+                            <Button
+                                android:id="@+id/btn_choose_images"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Choose Images" />
+
+                            <!-- TextView for "No file chosen" -->
+                            <TextView
+                                android:id="@+id/text_no_images_chosen"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="No images chosen"
+                                android:layout_marginStart="8dp"
+                                android:layout_gravity="center_vertical" />
+                        </LinearLayout>
+
+                        <Button
+                            android:id="@+id/buttonUploadImages"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="20dp"
+                            android:layout_marginBottom="20dp"
+                            android:background="@drawable/button_background"
+                            android:text="Upload Images" />
+
 
 
                     </LinearLayout>

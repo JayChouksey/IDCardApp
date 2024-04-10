@@ -64,8 +64,6 @@ public class SchoolInfoAdapter extends RecyclerView.Adapter<SchoolInfoAdapter.Vi
         private TextView textSchoolMobileValue;
         private TextView textSchoolAddress;
         private TextView textSchoolAddressValue;
-        private TextView textSchoolCode;
-        private TextView textSchoolCodeValue;
         private TextView textNumberOfStudents;
         private TextView textNumberOfStudentsValue;
         private TextView textStatus;
@@ -74,6 +72,8 @@ public class SchoolInfoAdapter extends RecyclerView.Adapter<SchoolInfoAdapter.Vi
         private TextView textCreatedValue;
         private TextView textAllowedFields;
         private TextView textAllowedFieldsValue;
+        private TextView textAllowedFieldsStaff;
+        private TextView textAllowedFieldsValueStaff;
         private Button btnBlock; // later work
         private Button btnEdit;
         private Button btnDelete;
@@ -90,8 +90,6 @@ public class SchoolInfoAdapter extends RecyclerView.Adapter<SchoolInfoAdapter.Vi
             textSchoolMobileValue = itemView.findViewById(R.id.textSchoolMobileValue);
             textSchoolAddress = itemView.findViewById(R.id.textSchoolAddress);
             textSchoolAddressValue = itemView.findViewById(R.id.textSchoolAddressValue);
-            textSchoolCode = itemView.findViewById(R.id.textSchoolCode);
-            textSchoolCodeValue = itemView.findViewById(R.id.textSchoolCodeValue);
             textNumberOfStudents = itemView.findViewById(R.id.textNumberOfStudents);
             textNumberOfStudentsValue = itemView.findViewById(R.id.textNumberOfStudentsValue);
             textStatus = itemView.findViewById(R.id.textStatus);
@@ -100,6 +98,7 @@ public class SchoolInfoAdapter extends RecyclerView.Adapter<SchoolInfoAdapter.Vi
             textCreatedValue = itemView.findViewById(R.id.textCreatedValue);
             textAllowedFields = itemView.findViewById(R.id.textAllowedFields);
             textAllowedFieldsValue = itemView.findViewById(R.id.textAllowedFieldsValue);
+            textAllowedFieldsValueStaff = itemView.findViewById(R.id.textAllowedFieldsStaffValue);
 
             // Buttons
             // btnBlock = itemView.findViewById(R.id.btnBlock); --> Later Work
@@ -141,7 +140,6 @@ public class SchoolInfoAdapter extends RecyclerView.Adapter<SchoolInfoAdapter.Vi
                         intent.putExtra("contactSchool",textSchoolMobileValue.getText().toString().trim());
                         intent.putExtra("emailSchool",textEmailValue.getText().toString().trim());
                         intent.putExtra("addressSchool",textSchoolAddressValue.getText().toString().trim());
-                        intent.putExtra("codeSchool",textSchoolCodeValue.getText().toString().trim());
                         itemView.getContext().startActivity(intent);
                     }
                 }
@@ -169,11 +167,11 @@ public class SchoolInfoAdapter extends RecyclerView.Adapter<SchoolInfoAdapter.Vi
             textEmailValue.setText(schoolInfo.getEmail());
             textSchoolMobileValue.setText(schoolInfo.getSchoolMobile());
             textSchoolAddressValue.setText(schoolInfo.getSchoolAddress());
-            textSchoolCodeValue.setText(schoolInfo.getSchoolCode());
             textNumberOfStudentsValue.setText(schoolInfo.getNumberOfStudents());
             textStatusValue.setText(schoolInfo.getStatus());
             textCreatedValue.setText(schoolInfo.getCreated());
             textAllowedFieldsValue.setText(schoolInfo.getAllowedFields());
+            textAllowedFieldsValueStaff.setText(schoolInfo.getAllowedFieldsStaff());
         }
     }
 }

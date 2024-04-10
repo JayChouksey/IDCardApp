@@ -95,49 +95,174 @@
                         app:cardElevation="4dp">
 
                         <LinearLayout
-                            android:id="@+id/dynamicLayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:padding="16dp">
 
-                            <!-- Add Student Heading -->
-                            <TextView
-                                android:id="@+id/test"
+                            <LinearLayout
+                                android:id="@+id/dynamicLayout"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="Add Student"
-                                android:textSize="24sp"
-                                android:textStyle="bold" />
+                                android:orientation="vertical">
 
-                            <com.google.android.material.textfield.TextInputLayout
-                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="20dp"
-                                android:hint="Select School*">
-
-                                <AutoCompleteTextView
-                                    android:id="@+id/school_dropdown"
+                                <!-- Add Student Heading -->
+                                <TextView
+                                    android:id="@+id/test"
                                     android:layout_width="match_parent"
-                                    android:layout_height="61dp"
-                                    android:inputType="none" />
-                            </com.google.android.material.textfield.TextInputLayout>
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="Add Data"
+                                    android:textSize="24sp"
+                                    android:textStyle="bold" />
+
+                                <com.google.android.material.textfield.TextInputLayout
+                                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="20dp"
+                                    android:hint="Select Role*">
+
+                                    <AutoCompleteTextView
+                                        android:id="@+id/role_dropdown"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="61dp"
+                                        android:inputType="none" />
+                                </com.google.android.material.textfield.TextInputLayout>
+
+                                <com.google.android.material.textfield.TextInputLayout
+                                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                                    android:id="@+id/school_dropdown_view"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="20dp"
+                                    android:hint="Select School*">
+
+                                    <AutoCompleteTextView
+                                        android:id="@+id/school_dropdown"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="61dp"
+                                        android:inputType="none" />
+                                </com.google.android.material.textfield.TextInputLayout>
 
 
-                            <Button
-                                android:id="@+id/buttonAddStudent"
-                                android:layout_width="wrap_content"
+                                <Button
+                                    android:id="@+id/buttonAddStudent"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:layout_marginTop="20dp"
+                                    android:layout_marginBottom="20dp"
+                                    android:background="@drawable/button_background"
+                                    android:text="Add" />
+
+                            </LinearLayout>
+
+                            <!-- Buttons -->
+                            <LinearLayout
+                                android:id="@+id/buttonLayout"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginTop="20dp"
-                                android:layout_marginBottom="20dp"
-                                android:background="@drawable/button_background"
-                                android:text="Add Student" />
+                                android:orientation="vertical"
+                                android:visibility="gone">
 
+                                <!-- Upload Photo TextView -->
+                                <TextView
+                                    android:id="@+id/uploadPhotoTextView"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Upload Photo"
+                                    android:textSize="18sp"
+                                    android:layout_marginTop="16dp" />
+
+                                <!-- LinearLayout for Choose File button and No file chosen TextView -->
+                                <LinearLayout
+                                    android:id="@+id/fileChooseLayout"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:layout_marginTop="10dp">
+
+                                    <!-- Choose File Button -->
+                                    <Button
+                                        android:id="@+id/chooseImageButton"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Choose File" />
+
+                                    <!-- No file chosen TextView -->
+                                    <TextView
+                                        android:id="@+id/noFileChosenTextView"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="No file chosen"
+                                        android:layout_marginStart="8dp" />
+
+                                    <ImageView
+                                        android:id="@+id/imageChosen"
+                                        android:layout_width="19dp"
+                                        android:layout_height="20dp"
+                                        android:layout_gravity="center"
+                                        android:layout_marginStart="10dp"/>
+
+                                </LinearLayout>
+
+                                <!-- LinearLayout for Buttons -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:layout_marginTop="80dp"
+                                    android:layout_marginBottom="20dp"
+                                    android:gravity="center">
+
+                                    <!-- Save Button -->
+                                    <Button
+                                        android:id="@+id/saveButton"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Save"
+                                        android:layout_marginStart="10dp"
+                                        android:background="@drawable/button_background"
+                                        android:paddingStart="10dp"
+                                        android:paddingTop="5dp"
+                                        android:paddingEnd="10dp"
+                                        android:paddingBottom="5dp" />
+
+                                    <!-- Reset Button -->
+                                    <Button
+                                        android:id="@+id/resetButton"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Reset"
+                                        android:layout_marginStart="10dp"
+                                        android:background="@drawable/button_background"
+                                        android:paddingStart="10dp"
+                                        android:paddingTop="5dp"
+                                        android:paddingEnd="10dp"
+                                        android:paddingBottom="5dp" />
+
+                                    <!-- Cancel Button -->
+                                    <Button
+                                        android:id="@+id/cancelButton"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Cancel"
+                                        android:layout_marginStart="10dp"
+                                        android:background="@drawable/button_background"
+                                        android:paddingStart="10dp"
+                                        android:paddingTop="5dp"
+                                        android:paddingEnd="10dp"
+                                        android:paddingBottom="5dp" />
+
+                                </LinearLayout>
+
+
+                            </LinearLayout>
+                            <!-- End of Buttons -->
 
                         </LinearLayout>
+
 
                     </androidx.cardview.widget.CardView>
 
