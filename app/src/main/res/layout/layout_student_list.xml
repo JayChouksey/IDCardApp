@@ -22,8 +22,8 @@
             <ImageView
                 android:id="@+id/img_school"
                 android:src="@drawable/add_student_icon"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:scaleType="fitCenter"
                 android:layout_gravity="center"
                 android:layout_marginBottom="10dp"/>

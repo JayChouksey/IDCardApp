@@ -49,17 +49,14 @@ public class ListStudents extends AppCompatActivity {
     List<String> schoolNames = new ArrayList<>(); // List to store school names
     List<String> schoolId = new ArrayList<>(); // List to store schoolId
     String [] status = {"Pending","Ready To Print","Printed"};
+    String [] role = {"Student", "Staff"};
     String strStatus; // To send the status to next activity
+    String strRole; // To send role to next activity
     Intent intentPending, intentReadyToPrint, intentPrinted;
-
-    AutoCompleteTextView autoCompleteSchool, autoCompleteStatus;
-    ArrayAdapter<String> adapterSchool, adapterStatus;
-
+    AutoCompleteTextView autoCompleteSchool, autoCompleteStatus, autoCompleteRole;
+    ArrayAdapter<String> adapterSchool, adapterStatus, adapterRole;
     Button submit;
-    RecyclerView recyclerView;
-    DynamicStudentAdapter adapter;
 
-    TextView test;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,10 +79,8 @@ public class ListStudents extends AppCompatActivity {
 
         // Status Dropdown
         autoCompleteStatus = findViewById(R.id.status_dropdown);
-
         adapterStatus = new ArrayAdapter<String>(this,R.layout.list_item,status);
         autoCompleteStatus.setAdapter(adapterStatus);
-
         autoCompleteStatus.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -104,26 +99,47 @@ public class ListStudents extends AppCompatActivity {
             }
         });
 
+        // Role Dropdown
+        autoCompleteRole = findViewById(R.id.role_dropdown);
+        adapterRole = new ArrayAdapter<String>(this,R.layout.list_item,role);
+        autoCompleteRole.setAdapter(adapterRole);
+        autoCompleteRole.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Switch case to set strStatus based on selected item
+                switch (position) {
+                    case 0:
+                        strRole = "Student";
+                        break;
+                    case 1:
+                        strRole = "Staff";
+                        break;
+                }
+            }
+        });
+
         // Switch to next Activity according to the status
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(strStatus.equals("Panding")){
                     intentPending.putExtra("Status",strStatus);
+                    intentPending.putExtra("Role",strRole);
                     startActivity(intentPending);
                 }
                 else if(strStatus.equals("Ready to print")){
                     intentReadyToPrint.putExtra("Status",strStatus);
+                    intentReadyToPrint.putExtra("Role",strRole);
                     startActivity(intentReadyToPrint);
 
                 }
                 else{
                     intentPrinted.putExtra("Status",strStatus);
+                    intentPrinted.putExtra("Role",strRole);
                     startActivity(intentPrinted);
                 }
             }
         });
-
     }
     // Main function ends here
 

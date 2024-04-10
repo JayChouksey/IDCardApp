@@ -31,11 +31,13 @@ import java.util.Set;
 
 public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAdapter.DynamicStudentViewHolder> {
     private List<DynamicStudent> studentList;
+    private Context context;
     private SharedPreferences sharedPreferences;
     private String selectedStudentIds = ""; // String to store selected student IDs
 
-    public DynamicStudentAdapter(List<DynamicStudent> studentList) {
+    public DynamicStudentAdapter(List<DynamicStudent> studentList, Context context) {
         this.studentList = studentList;
+        this.context = context;
     }
 
     // Method to get the id's of the selected students

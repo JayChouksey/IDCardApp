@@ -51,12 +51,18 @@ public class ReadyToPrintStudent extends AppCompatActivity {
 
         intent = getIntent();
 
+        String role = intent.getStringExtra("Role");
+        if(role.equals("Student")){
+            fetchStudentData();
+        }
+        else if(role.equals("Staff")){
+            fetchStaffData();
+        }
+
         // Setting user text name to user
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
 
-
-        fetchStudentData();
 
         Button delete = findViewById(R.id.deleteButton);
         Button statusPrinted = findViewById(R.id.movePrintedButton);
@@ -65,21 +71,36 @@ public class ReadyToPrintStudent extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String id = getSelectedStudentIds();
-                deleteStudents(id);
+                if(role.equals("Student")){
+                    deleteStudents(id);
+                }
+                else{
+                    deleteStaffs(id);
+                }
             }
         });
         statusPrinted.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String id = getSelectedStudentIds();
-                changeStatusToPrinted(id);
+                if(role.equals("Student")) {
+                    changeStatusToPrinted(id);
+                }
+                else{
+                    changeStatusPrintedStaff(id);
+                }
             }
         });
         statusPending.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String id = getSelectedStudentIds();
-                changeStatusToPending(id);
+                if(role.equals("Student")) {
+                    changeStatusToPending(id);
+                }
+                else{
+                    changeStatusToPending(id);
+                }
             }
         });
 
@@ -116,14 +137,9 @@ public class ReadyToPrintStudent extends AppCompatActivity {
                                 Iterator<String> keys = studentObject.keys();
                                 while (keys.hasNext()) {
                                     String key = keys.next();
-                                    // Check if the key is "avatar"
-                                    if (key.equals("avatar")) {
-                                        // Break the loop if "avatar" is encountered
-                                        break;
-                                    }
-                                    // Skip if the key is "_id"
-                                    if (key.equals("_id")) {
-                                        continue;
+                                    if (key.equals("avatar") || key.equals("__v") || key.equals("createdAt") ||
+                                            key.equals("updatedAt")) {
+                                        continue; // Skip this key
                                     }
                                     String value = studentObject.getString(key);
                                     student.addField(key, value);
@@ -159,6 +175,74 @@ public class ReadyToPrintStudent extends AppCompatActivity {
         // Add the request to the RequestQueue
         queue.add(jsonObjectRequest);
     }
+
+    private void fetchStaffData() {
+        // Get the authorization token
+        String token = getToken();
+        String id = getId(); // From local storage
+        String status = intent.getStringExtra("Status");
+
+        String url = "https://id-card-backend-2.onrender.com/user/staffs/" + id + "?status=" + status;
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, null,
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Toast.makeText(ReadyToPrintStudent.this, "Data Fetched Successfully", Toast.LENGTH_SHORT).show();
+                        List<DynamicStudent> studentList = new ArrayList<>();
+                        try {
+                            JSONArray studentsArray = response.getJSONArray("staff");
+                            for (int i = 0; i < studentsArray.length(); i++) {
+                                JSONObject studentObject = studentsArray.getJSONObject(i);
+                                DynamicStudent student = new DynamicStudent();
+
+                                // Iterate over the keys of the JSON object
+                                Iterator<String> keys = studentObject.keys();
+                                while (keys.hasNext()) {
+                                    String key = keys.next();
+                                    if (key.equals("avatar") || key.equals("__v") || key.equals("createdAt") ||
+                                            key.equals("updatedAt")) {
+                                        continue; // Skip this key
+                                    }
+                                    String value = studentObject.getString(key);
+                                    student.addField(key, value);
+                                }
+                                studentList.add(student);
+                            }
+
+                            // Updating recycler view for data fetching
+                            updateRecyclerView(studentList);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    String errorMessage = new String(error.networkResponse.data);
+                    Toast.makeText(ReadyToPrintStudent.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(ReadyToPrintStudent.this, "Error adding student", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> header = new HashMap<>();
+                header.put("Authorization", token);
+                return header;
+            }
+        };
+
+        // Add the request to the RequestQueue
+        queue.add(jsonObjectRequest);
+    }
+
     // End of Fetching student data
 
 
@@ -167,7 +251,7 @@ public class ReadyToPrintStudent extends AppCompatActivity {
         recyclerView = findViewById(R.id.student_list_recycle);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(ReadyToPrintStudent.this));
-        adapter = new DynamicStudentAdapter(studentList);
+        adapter = new DynamicStudentAdapter(studentList, ReadyToPrintStudent.this);
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged(); // Notify adapter of dataset changes
     }
@@ -295,6 +379,149 @@ public class ReadyToPrintStudent extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         // Handle response
                         Toast.makeText(ReadyToPrintStudent.this, "Status of selected students updated successfully", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle error
+                        if (error.networkResponse != null) {
+                            // If there's an error response from the server, handle it here
+                            String errorMessage = new String(error.networkResponse.data);
+                            Toast.makeText(ReadyToPrintStudent.this, "Error:" + errorMessage, Toast.LENGTH_SHORT).show();
+                            error.printStackTrace();
+                        }
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                // Set authorization header
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", getToken());
+                return headers;
+            }
+        };
+
+        // Add the request to the RequestQueue
+        RequestQueue requestQueue = Volley.newRequestQueue(ReadyToPrintStudent.this);
+        requestQueue.add(jsonObjectRequest);
+    }
+
+
+    public void changeStatusToPendingStaff(String staffIds) {
+        // Create JSON object with the request body
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("staffIds", staffIds);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Create request URL
+        String schoolId = getId();
+        String url = "https://id-card-backend-2.onrender.com/user/staff/change-status/pending/" + schoolId;
+
+        // Create request
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Handle response
+                        Toast.makeText(ReadyToPrintStudent.this, "Status of selected staffs updated successfully", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle error
+                        if (error.networkResponse != null) {
+                            // If there's an error response from the server, handle it here
+                            String errorMessage = new String(error.networkResponse.data);
+                            Toast.makeText(ReadyToPrintStudent.this, "Error:" + errorMessage, Toast.LENGTH_SHORT).show();
+                            error.printStackTrace();
+                        }
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                // Set authorization header
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", getToken());
+                return headers;
+            }
+        };
+
+        // Add the request to the RequestQueue
+        RequestQueue requestQueue = Volley.newRequestQueue(ReadyToPrintStudent.this);
+        requestQueue.add(jsonObjectRequest);
+    }
+    public void changeStatusPrintedStaff(String staffIds) {
+        // Create JSON object with the request body
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("staffIds", staffIds);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Create request URL
+        String schoolId = getId();
+        String url = "https://id-card-backend-2.onrender.com/user/staff/change-status/printed/" + schoolId;
+
+        // Create request
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Handle response
+                        Toast.makeText(ReadyToPrintStudent.this, "Status of selected staffs updated successfully", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle error
+                        if (error.networkResponse != null) {
+                            // If there's an error response from the server, handle it here
+                            String errorMessage = new String(error.networkResponse.data);
+                            Toast.makeText(ReadyToPrintStudent.this, "Error:" + errorMessage, Toast.LENGTH_SHORT).show();
+                            error.printStackTrace();
+                        }
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                // Set authorization header
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", getToken());
+                return headers;
+            }
+        };
+
+        // Add the request to the RequestQueue
+        RequestQueue requestQueue = Volley.newRequestQueue(ReadyToPrintStudent.this);
+        requestQueue.add(jsonObjectRequest);
+    }
+    public void deleteStaffs(String staffIds) {
+        // Create JSON object with the request body
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("staffIds", staffIds);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Create request URL
+        String schoolId = getId();
+        String url = "https://id-card-backend-2.onrender.com/user/staffs/delete/" + schoolId;
+
+        // Create request
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Handle response
+                        Toast.makeText(ReadyToPrintStudent.this, "Status of selected staffs updated successfully", Toast.LENGTH_SHORT).show();
                     }
                 },
                 new Response.ErrorListener() {
