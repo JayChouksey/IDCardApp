@@ -274,7 +274,7 @@ public class AddSchool extends AppCompatActivity {
     private void updateSchool(String schoolName, String mobileNo, String email, String password, String confirmPassword,
                                 String address, String schoolId) {
 
-        String URL = "https://id-card-backend-2.onrender.com/user/edit/school" + schoolId;
+        String URL = "https://id-card-backend-2.onrender.com/user/edit/school/" + schoolId;
         //our custom volley request
         VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, URL,
                 new Response.Listener<NetworkResponse>() {
@@ -284,6 +284,7 @@ public class AddSchool extends AppCompatActivity {
                             btnSave.setText("Edit");
                             JSONObject obj = new JSONObject(new String(response.data));
                             Toast.makeText(getApplicationContext(), "School updated successfully!", Toast.LENGTH_SHORT).show();
+                            finish();
                         } catch (JSONException e) {
                             btnSave.setText("Edit");
                             e.printStackTrace();

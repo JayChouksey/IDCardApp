@@ -322,7 +322,7 @@ public class PendingStudent extends AppCompatActivity {
             protected Map<String, String> getParams() throws AuthFailureError {
                 // Add parameters here (if needed)
                 Map<String, String> params = new HashMap<>();
-                params.put("status", "Ready to print");
+                params.put("status", "Panding");
                 return params;
             }
         };
@@ -331,13 +331,14 @@ public class PendingStudent extends AppCompatActivity {
         queue.add(stringRequest);
     }
     public void downloadImages(Context context) {
+        String schoolId = getId();
+        String url = "https://id-card-backend-2.onrender.com/user/student/images/" + getId();
 
-        String url = "fkl";
         // Instantiate the RequestQueue
         RequestQueue queue = Volley.newRequestQueue(context);
 
         // Request a string response from the provided URL
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -350,11 +351,28 @@ public class PendingStudent extends AppCompatActivity {
                 // Handle errors
                 Toast.makeText(context, "Failed to download images", Toast.LENGTH_SHORT).show();
             }
-        });
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                // Set custom headers
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", getToken());
+                return headers;
+            }
+
+            @Override
+            protected Map<String, String> getParams() {
+                // Set parameters in the request body
+                Map<String, String> params = new HashMap<>();
+                params.put("status", "Panding");
+                return params;
+            }
+        };
 
         // Add the request to the RequestQueue
         queue.add(stringRequest);
     }
+
     // End of Download image and excel
 
     // Method to update school list recycler view

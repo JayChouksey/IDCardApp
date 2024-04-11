@@ -1,6 +1,7 @@
 package com.example.idcard;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -116,7 +118,7 @@ public class AddStudent extends AppCompatActivity {
         buttonChooseImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                chooseImageFromGallery();
+                showImagePickerOptions();
             }
         });
         resetButton.setOnClickListener(new View.OnClickListener() {
@@ -756,11 +758,11 @@ public class AddStudent extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String item = parent.getItemAtPosition(position).toString();
                 //Toast.makeText(getApplicationContext(),"Item: "+idArray[position],Toast.LENGTH_SHORT).show();
-                if(strRole.equals("Student")){
-                    fetchRequiredFields(idArray[position]);
+                if(strRole.equals("Staff")){
+                    fetchRequiredFieldsStaff(idArray[position]);
                 }
                 else{
-                    fetchRequiredFieldsStaff(idArray[position]);
+                    fetchRequiredFields(idArray[position]);
                 }
 
             }
@@ -872,29 +874,60 @@ public class AddStudent extends AppCompatActivity {
 
     // Image upload functions
 
+    private void showImagePickerOptions() {
+        // Options dialog to choose between picking from gallery or capturing from camera
+        CharSequence[] options = {"Choose from Gallery", "Take Photo"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose an option");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (item == 0) {
+                    // Choose from Gallery
+                    chooseImageFromGallery();
+                } else if (item == 1) {
+                    // Capture from Camera
+                    takePhoto();
+                }
+            }
+        });
+        builder.show();
+    }
+
     private void chooseImageFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        //startActivityForResult(intent, REQUEST_CODE_IMAGE_PICKER);
         startActivityForResult(intent, 100);
+    }
+
+    private void takePhoto() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, 200);
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
-
-            //getting the image Uri
-            Uri imageUri = data.getData();
-            try {
-                //getting bitmap object from uri
-                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-
-                //displaying selected image to imageview
-                imgChosen.setImageBitmap(bitmap);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 100 && data != null) {
+                // Image selected from gallery
+                Uri imageUri = data.getData();
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                    imgChosen.setImageBitmap(bitmap);
+                    textNoFileChosen.setText("");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (requestCode == 200 && data != null) {
+                // Image captured from camera
+                Bundle extras = data.getExtras();
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+                bitmap = imageBitmap;
+                imgChosen.setImageBitmap(imageBitmap);
                 textNoFileChosen.setText("");
-
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }
