@@ -7,6 +7,7 @@ public class DynamicStudent {
 
     private Map<String, String> fields;
     private boolean isSelected; // Field to track selection status
+    private String avatarUrl;
 
 
     public DynamicStudent() {
@@ -33,5 +34,18 @@ public class DynamicStudent {
     public void setSelected(boolean selected) {
         isSelected = selected;
     }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public String getStudentId() {
+        return getValue("_id");
+    }
+
 
 }

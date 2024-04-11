@@ -104,7 +104,6 @@
                 android:layout_height="wrap_content"
                 android:text="Move To Pending"
                 android:textSize="18sp"
-                android:layout_marginTop="20dp"
                 android:background="@drawable/button_background"/>
 
             <Button
@@ -113,7 +112,25 @@
                 android:layout_height="wrap_content"
                 android:text="Move To Ready To Print"
                 android:textSize="18sp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/button_background"/>
+
+            <Button
+                android:id="@+id/exportExcelButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Export Records"
+                android:textSize="18sp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/button_background"/>
+
+            <Button
+                android:id="@+id/downloadImagesButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Download Images"
+                android:textSize="18sp"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/button_background"/>
 
             <Button
@@ -122,11 +139,11 @@
                 android:layout_height="wrap_content"
                 android:text="Delete"
                 android:textSize="18sp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/button_background"/>
 
             <!-- Select all feature -> will implemented later -->
-               <!--<androidx.cardview.widget.CardView
+               <androidx.cardview.widget.CardView
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
                android:layout_marginTop="10dp"
@@ -153,8 +170,7 @@
 
                </LinearLayout>
 
-
-           </androidx.cardview.widget.CardView>-->
+           </androidx.cardview.widget.CardView>
 
         </LinearLayout>
         </androidx.cardview.widget.CardView>

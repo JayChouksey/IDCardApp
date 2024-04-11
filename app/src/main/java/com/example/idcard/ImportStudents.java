@@ -214,8 +214,15 @@ public class ImportStudents extends AppCompatActivity {
                     @Override
                     public void onResponse(NetworkResponse response) {
                         try {
+                            if(strRole.equals("Student")){
+                                uploadExcel.setText("Upload Student Excel");
+                            }
+                            else{
+                                uploadExcel.setText("Upload Staff Excel");
+                            }
                             JSONObject obj = new JSONObject(new String(response.data));
                             Toast.makeText(getApplicationContext(), "Excel file uploaded successfully!", Toast.LENGTH_SHORT).show();
+                            noFileChosen.setText("No file chosen");
                         } catch (JSONException e) {
                             if(strRole.equals("Student")){
                                 uploadExcel.setText("Upload Student Excel");
@@ -291,8 +298,15 @@ public class ImportStudents extends AppCompatActivity {
                     @Override
                     public void onResponse(NetworkResponse response) {
                         try {
+                            if(strRole.equals("Student")){
+                                uploadExcel.setText("Upload Student Excel");
+                            }
+                            else{
+                                uploadExcel.setText("Upload Staff Excel");
+                            }
                             JSONObject obj = new JSONObject(new String(response.data));
                             Toast.makeText(getApplicationContext(), "Excel file uploaded successfully!", Toast.LENGTH_SHORT).show();
+                            noFileChosen.setText("No file chosen");
                         } catch (JSONException e) {
                             if(strRole.equals("Student")){
                                 uploadExcel.setText("Upload Student Excel");
@@ -390,6 +404,7 @@ public class ImportStudents extends AppCompatActivity {
                                 }
                                 JSONObject obj = new JSONObject(new String(response.data));
                                 responseMessages.add("Image uploaded successfully: " + obj.getString("message"));
+                                textNoImagesChosen.setText("No images chosen");
                             } catch (JSONException e) {
                                 if(strRole.equals("Student")){
                                     uploadImages.setText("Upload Student Images");
@@ -486,6 +501,7 @@ public class ImportStudents extends AppCompatActivity {
                                 }
                                 JSONObject obj = new JSONObject(new String(response.data));
                                 responseMessages.add("Image uploaded successfully: " + obj.getString("message"));
+                                textNoImagesChosen.setText("No images chosen");
                             } catch (JSONException e) {
                                 if(strRole.equals("Student")){
                                     uploadImages.setText("Upload Student Images");
@@ -593,7 +609,7 @@ public class ImportStudents extends AppCompatActivity {
                 // Get the file path (be cautious about security implications)
                 filePath = getRealPathFromUri(uri); // Implement getRealPathFromUri function
                 fileData = getFileDataFromExcelFile(uri);
-                noFileChosen.setText("Fi");
+                noFileChosen.setText("Excel File Selected");
 
             } else {
                 Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
@@ -627,7 +643,7 @@ public class ImportStudents extends AppCompatActivity {
         if (selectedImageUris.isEmpty()) {
             textNoImagesChosen.setVisibility(View.VISIBLE);
         } else {
-            textNoImagesChosen.setVisibility(View.GONE);
+            textNoImagesChosen.setText("Images Selected");
         }
     }
 

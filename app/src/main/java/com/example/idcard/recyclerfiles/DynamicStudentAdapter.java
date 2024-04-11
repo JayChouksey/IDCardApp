@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,12 +19,16 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.idcard.AddSchool;
 import com.example.idcard.AddStudent;
 import com.example.idcard.MainActivity;
 import com.example.idcard.R;
 import com.example.idcard.api.SchoolDeletionHelper;
 import com.example.idcard.api.StudentDeletionHelper;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.Map;
@@ -78,11 +83,27 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
         return studentList.size();
     }
 
+    // Method to select all students and update selected student IDs string
+    public void selectAllStudents(boolean isSelected) {
+        selectedStudentIds = ""; // Clear existing selection
+
+        // Update selection status for all students
+        for (DynamicStudent student : studentList) {
+            student.setSelected(isSelected);
+            if (isSelected) {
+                selectedStudentIds += student.getStudentId() + ","; // Add student ID to the string
+            }
+        }
+
+        notifyDataSetChanged(); // Notify adapter of data change
+    }
+
     public class DynamicStudentViewHolder extends RecyclerView.ViewHolder {
         private LinearLayout dynamicLinearLayout;
         private CardView cardView;
         private Button btnEdit;
         private Button btnDelete;
+        private ImageView avatar;
 
         public DynamicStudentViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -90,9 +111,11 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
             cardView = itemView.findViewById(R.id.cardView);
             btnEdit = itemView.findViewById(R.id.btnEdit);
             btnDelete = itemView.findViewById(R.id.btnDelete);
+            avatar = itemView.findViewById(R.id.avatar_img);
 
             sharedPreferences = itemView.getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
             String token = sharedPreferences.getString("token", "");
+
 
             // Button click listeners
             btnEdit.setOnClickListener(new View.OnClickListener() {
@@ -166,6 +189,7 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
             });
         }
 
+
         public void bind(DynamicStudent student) {
             // Clear existing views
             dynamicLinearLayout.removeAllViews();
@@ -174,6 +198,19 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
                 cardView.setBackgroundResource(R.drawable.border_selected);
             } else {
                 cardView.setBackgroundResource(R.drawable.border_unselected);
+            }
+
+            String avatarUrl = student.getAvatarUrl();
+            if (avatarUrl != null && !avatarUrl.isEmpty()) {
+                RequestOptions requestOptions = new RequestOptions()
+                        .placeholder(R.drawable.school_list_student) // Placeholder image while loading
+                        .error(R.drawable.about_icon); // Error image if loading fails
+
+                Glide.with(itemView.getContext())
+                        .load(avatarUrl)
+                        .apply(requestOptions)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE) // Disable disk cache for now
+                        .into(avatar);
             }
 
             // Loop through all fields and add TextViews dynamically

@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +26,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.idcard.recyclerfiles.DynamicStudent;
 import com.example.idcard.recyclerfiles.DynamicStudentAdapter;
@@ -63,10 +66,21 @@ public class PrintedStudent extends AppCompatActivity {
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
 
+        // Select all feature
+        CheckBox selectAllCheckbox = findViewById(R.id.select_all);
+        selectAllCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                adapter.selectAllStudents(isChecked); // Call selectAllStudents method of the adapter
+            }
+        });
+
 
         Button delete = findViewById(R.id.deleteButton);
         Button statusReadyToPrint = findViewById(R.id.moveReadyToPrintdButton);
         Button statusPending = findViewById(R.id.movePendingButton);
+        Button exportExcel = findViewById(R.id.exportExcelButton);
+        Button downloadImages = findViewById(R.id.downloadImagesButton);
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,11 +121,24 @@ public class PrintedStudent extends AppCompatActivity {
             }
         });
 
+        exportExcel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                downloadExcelFile(PrintedStudent.this);
+            }
+        });
+        downloadImages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                downloadImages(PrintedStudent.this);
+            }
+        });
+
         //clearSchoolId(); // clearing school id, stored locally
     }
     // Main method ends
 
-
+    // fetching student and staff data
     private void fetchStudentData() {
         // Get the authorization token
         String token = getToken(); // From local storage
@@ -145,6 +172,13 @@ public class PrintedStudent extends AppCompatActivity {
                                     }
                                     String value = studentObject.getString(key);
                                     student.addField(key, value);
+                                }
+
+                                // Handling the avatar key separately to extract the URL
+                                JSONObject avatarObject = studentObject.optJSONObject("avatar");
+                                if (avatarObject != null) {
+                                    String avatarUrl = avatarObject.optString("url");
+                                    student.setAvatarUrl(avatarUrl);
                                 }
                                 studentList.add(student);
                             }
@@ -212,6 +246,12 @@ public class PrintedStudent extends AppCompatActivity {
                                     String value = studentObject.getString(key);
                                     student.addField(key, value);
                                 }
+                                // Handling the avatar key separately to extract the URL
+                                JSONObject avatarObject = studentObject.optJSONObject("avatar");
+                                if (avatarObject != null) {
+                                    String avatarUrl = avatarObject.optString("url");
+                                    student.setAvatarUrl(avatarUrl);
+                                }
                                 studentList.add(student);
                             }
 
@@ -244,6 +284,78 @@ public class PrintedStudent extends AppCompatActivity {
         // Add the request to the RequestQueue
         queue.add(jsonObjectRequest);
     }
+    // fetching student and staff data
+
+    // Download image and excel
+    public void downloadExcelFile(Context context) {
+        String schoolId = getId();
+        String url = "https://id-card-backend-2.onrender.com/user/excel/data/" + schoolId;
+
+        // Instantiate the RequestQueue
+        RequestQueue queue = Volley.newRequestQueue(context);
+
+        // Create a StringRequest with POST method
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Handle successful response (if needed)
+                        Toast.makeText(context, "Excel file downloaded successfully", Toast.LENGTH_SHORT).show();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handle errors
+                Toast.makeText(context, "Failed to download excel file", Toast.LENGTH_SHORT).show();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                // Add headers here
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", getToken());
+                return headers;
+            }
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                // Add parameters here (if needed)
+                Map<String, String> params = new HashMap<>();
+                params.put("status", "Ready to print");
+                return params;
+            }
+        };
+
+        // Add the request to the RequestQueue
+        queue.add(stringRequest);
+    }
+
+    public void downloadImages(Context context) {
+
+        String url = "fkl";
+        // Instantiate the RequestQueue
+        RequestQueue queue = Volley.newRequestQueue(context);
+
+        // Request a string response from the provided URL
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Handle successful response (if needed)
+                        Toast.makeText(context, "Images downloading started successfully", Toast.LENGTH_SHORT).show();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handle errors
+                Toast.makeText(context, "Failed to download images", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Add the request to the RequestQueue
+        queue.add(stringRequest);
+    }
+    // End of Download image and excel
 
     // Method to update school list recycler view
     private void updateRecyclerView(List<DynamicStudent> studentList) {
