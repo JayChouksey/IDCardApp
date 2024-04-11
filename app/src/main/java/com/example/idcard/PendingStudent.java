@@ -75,7 +75,7 @@ public class PendingStudent extends AppCompatActivity {
                 else{
                     deleteStaffs(id);
                 }
-
+                finish();
             }
         });
         statusReadyToPrint.setOnClickListener(new View.OnClickListener() {
@@ -88,7 +88,7 @@ public class PendingStudent extends AppCompatActivity {
                 else{
                     changeStatusReadyToPrintStaff(id);
                 }
-
+                finish();
             }
         });
         statusPrinted.setOnClickListener(new View.OnClickListener() {
@@ -101,7 +101,7 @@ public class PendingStudent extends AppCompatActivity {
                 else{
                     changeStatusPrintedStaff(id);
                 }
-
+                finish();
             }
         });
 
@@ -139,7 +139,7 @@ public class PendingStudent extends AppCompatActivity {
                                 while (keys.hasNext()) {
                                     String key = keys.next();
                                     if (key.equals("avatar") || key.equals("__v") || key.equals("createdAt") ||
-                                            key.equals("updatedAt")) {
+                                            key.equals("updatedAt") || key.equals("school") || key.equals("photoName")) {
                                         continue; // Skip this key
                                     }
                                     String value = studentObject.getString(key);
@@ -206,7 +206,7 @@ public class PendingStudent extends AppCompatActivity {
                                 while (keys.hasNext()) {
                                     String key = keys.next();
                                     if (key.equals("avatar") || key.equals("__v") || key.equals("createdAt") ||
-                                            key.equals("updatedAt")) {
+                                            key.equals("updatedAt") || key.equals("school") || key.equals("photoName")) {
                                         continue; // Skip this key
                                     }
                                     String value = studentObject.getString(key);

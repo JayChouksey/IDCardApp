@@ -109,7 +109,7 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
                         editor.apply();
 
                         // Temporary
-                        Toast.makeText(itemView.getContext(), "Error in Edit Student", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(itemView.getContext(), "Error in Editing", Toast.LENGTH_SHORT).show();
                         // Will do it later
                         /*Intent intent = new Intent(itemView.getContext(), AddStudent.class);
                         itemView.getContext().startActivity(intent);*/
@@ -179,39 +179,148 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
             // Loop through all fields and add TextViews dynamically
             for (Map.Entry<String, String> entry : student.getFields().entrySet()) {
 
-                String title = entry.getKey();
                 String data = entry.getValue();
+                String title = "";
+                switch (entry.getKey()) {
+                    // for staff
+                    case "name":
+                        title = "Name: ";
+                        break;
+                    case "fatherName":
+                        title = "Father's Name: ";
+                        break;
+                    case "husbandName":
+                        title = "Husband's Name: ";
+                        break;
+                    case "dob":
+                        title = "Date of Birth: ";
+                        break;
+                    case "qualification":
+                        title = "Qualification: ";
+                        break;
+                    case "designation":
+                        title = "Designation: ";
+                        break;
+                    case "doj":
+                        title = "Date of Joining: ";
+                        break;
+                    case "staffType":
+                        title = "Staff Type: ";
+                        break;
+                    case "address":
+                        title = "Address: ";
+                        break;
+                    case "contact":
+                        title = "Contact No.: ";
+                        break;
+                    case "uid":
+                        title = "UID No.: ";
+                        break;
+                    case "email":
+                        title = "E-mail: ";
+                        break;
+                    case "staffID":
+                        title = "Staff ID: ";
+                        break;
+                    case "udiseCode":
+                        title = "UDISE Code: ";
+                        break;
+                    case "schoolName":
+                        title = "School Name: ";
+                        break;
+                    case "bloodGroup":
+                        title = "Blood Group: ";
+                        break;
+                    case "dispatchNo":
+                        title = "Dispatch No.: ";
+                        break;
+                    case "dateOfissue":
+                        title = "Date of Issue: ";
+                        break;
+                    case "ihrmsNo":
+                        title = "IHRMS No.: ";
+                        break;
+                    case "beltNo":
+                        title = "Belt No.: ";
+                        break;
 
-                // Create LinearLayout
-                LinearLayout linearLayout = new LinearLayout(itemView.getContext());
-                linearLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT));
-                linearLayout.setPadding(20,10,10,10);
-                linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+                    // for student
+                    case "studentName":
+                        title = "Student Name";
+                        break;
+                    case "motherName":
+                        title = "Mother's Name: ";
+                        break;
+                    case "class":
+                        title = "Class: ";
+                        break;
+                    case "section":
+                        title = "Section: ";
+                        break;
+                    case "rollNo":
+                        title = "Roll No.: ";
+                        break;
+                    case "admissionNo":
+                        title = "Admission No.: ";
+                        break;
+                    case "studentID":
+                        title = "Student ID: ";
+                        break;
+                    case "aadharNo":
+                        title = "Aadhar No.: ";
+                        break;
+                    case "ribbonColour":
+                        title = "Ribbon Colour: ";
+                        break;
+                    case "routeNo":
+                        title = "Route No.: ";
+                        break;
+                    case "modeOfTransport":
+                        title = "Mode of Transport: ";
+                        break;
+                    case "status":
+                        title = "Status: ";
+                        break;
+                }
 
-                // Create TextView for Title
-                TextView distributorLabel = new TextView(itemView.getContext());
-                LinearLayout.LayoutParams labelParams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                distributorLabel.setLayoutParams(labelParams);
-                distributorLabel.setText(title);
-                distributorLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                distributorLabel.setTypeface(null, Typeface.BOLD);
-                linearLayout.addView(distributorLabel);
+                if(entry.getValue().equals("Panding")){
+                    data = "Pending";
+                }
 
-                // Create TextView for detail
-                TextView distributorName = new TextView(itemView.getContext());
-                LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                nameParams.setMargins(10, 0, 0, 0); // Add left margin
-                distributorName.setLayoutParams(nameParams);
-                distributorName.setText(data);
-                linearLayout.addView(distributorName);
+                if(!entry.getKey().equals("_id")){
+                    // Create LinearLayout
+                    LinearLayout linearLayout = new LinearLayout(itemView.getContext());
+                    linearLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT));
+                    linearLayout.setPadding(20,10,10,10);
+                    linearLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-                dynamicLinearLayout.addView(linearLayout);
+                    // Create TextView for Title
+                    TextView distributorLabel = new TextView(itemView.getContext());
+                    LinearLayout.LayoutParams labelParams = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT);
+                    distributorLabel.setLayoutParams(labelParams);
+                    distributorLabel.setText(title);
+                    distributorLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                    distributorLabel.setTypeface(null, Typeface.BOLD);
+                    linearLayout.addView(distributorLabel);
+
+                    // Create TextView for detail
+                    TextView distributorName = new TextView(itemView.getContext());
+                    LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT);
+                    nameParams.setMargins(10, 0, 0, 0); // Add left margin
+                    distributorName.setLayoutParams(nameParams);
+                    distributorName.setText(data);
+                    linearLayout.addView(distributorName);
+
+                    dynamicLinearLayout.addView(linearLayout);
+                }
+
+
             }
         }
     }

@@ -77,6 +77,7 @@ public class PrintedStudent extends AppCompatActivity {
                 else{
                     deleteStaffs(id);
                 }
+                finish();
             }
         });
         statusReadyToPrint.setOnClickListener(new View.OnClickListener() {
@@ -89,6 +90,7 @@ public class PrintedStudent extends AppCompatActivity {
                 else{
                     changeStatusReadyToPrintStaff(id);
                 }
+                finish();
             }
         });
         statusPending.setOnClickListener(new View.OnClickListener() {
@@ -101,6 +103,7 @@ public class PrintedStudent extends AppCompatActivity {
                 else{
                     changeStatusToPendingStaff(id);
                 }
+                finish();
             }
         });
 
@@ -137,7 +140,7 @@ public class PrintedStudent extends AppCompatActivity {
                                 while (keys.hasNext()) {
                                     String key = keys.next();
                                     if (key.equals("avatar") || key.equals("__v") || key.equals("createdAt") ||
-                                            key.equals("updatedAt")) {
+                                            key.equals("updatedAt") || key.equals("school") || key.equals("photoName")) {
                                         continue; // Skip this key
                                     }
                                     String value = studentObject.getString(key);
