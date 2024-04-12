@@ -20,6 +20,9 @@
         android:theme="@style/Theme.IDCard"
         tools:targetApi="31">
         <activity
+            android:name=".SchoolHome"
+            android:exported="false" />
+        <activity
             android:name=".ResetPassword"
             android:exported="false" />
         <activity

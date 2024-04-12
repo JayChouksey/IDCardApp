@@ -94,9 +94,11 @@ public class DashboardFragment extends Fragment {
                         try {
                             String totalSchool = Integer.toString(response.getInt("schoolCount"));
                             String totalStudent = Integer.toString(response.getInt("studentCount"));
+                            String totalStaff = Integer.toString(response.getInt("staffCount"));
 
                             textview_total_schools.setText(totalSchool);
                             textview_total_student.setText(totalStudent);
+                            textview_total_staff.setText(totalStaff);
 
                         } catch (JSONException e) {
                             e.printStackTrace();

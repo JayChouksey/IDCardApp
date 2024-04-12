@@ -79,4 +79,8 @@ public class MainActivity extends AppCompatActivity {
         return sharedPreferences.getString("authToken", null);
     }
 
+    @Override
+    public void onBackPressed() {
+        // Empty
+    }
 }

@@ -12,5 +12,8 @@
     <color name="blue">#CFDEFF</color>
     <color name="school_color">#F44336</color>
     <color name="student_color">#3F51B5</color>
+    <color name="switch_track_color">#E0E0E0</color>
+    <color name="switch_thumb_color">#035495</color>
+
 
 </resources>

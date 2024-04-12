@@ -158,7 +158,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:layout_marginStart="10dp"
-                android:text="Ludhiana, Punjab"
+                android:text="Bambiha Bhai(Moga), Punjab"
                 android:textColor="@color/black"
                 android:gravity="start|end"
                 android:textSize="18sp"
