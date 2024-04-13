@@ -72,13 +72,13 @@ public class ForgetPassword extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         // Handle the response JSON
                         try {
-                            boolean success = response.getBoolean("success");
+                            boolean success = response.getBoolean("succcess");
                             String message = response.getString("message");
                             String token = response.getString("Token");
 
                             if (success) {
                                 // Show success message and save the token
-                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "OTP sent successfully to your respected email", Toast.LENGTH_SHORT).show();
                                 // Save the token or pass it to the next activity
                                 Intent intent = new Intent(ForgetPassword.this, ResetPassword.class);
                                 intent.putExtra("resetToken",token);
@@ -89,7 +89,7 @@ public class ForgetPassword extends AppCompatActivity {
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            Toast.makeText(context, "Error parsing response", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 },
@@ -97,12 +97,22 @@ public class ForgetPassword extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
-                        Toast.makeText(context, "Error resetting password", Toast.LENGTH_SHORT).show();
+                        if (error.networkResponse != null && error.networkResponse.data != null) {
+                            String errorMessage = new String(error.networkResponse.data);
+                            Toast.makeText(context, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(context, "Error resetting password", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
 
         // Add the request to the RequestQueue
         queue.add(jsonObjectRequest);
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Empty
     }
 
 }

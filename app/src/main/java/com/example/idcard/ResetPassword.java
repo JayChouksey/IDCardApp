@@ -74,63 +74,75 @@ public class ResetPassword extends AppCompatActivity {
     private void resetPassword(Context context, String token, String otp, String password, String confirmPassword) {
         String url = "https://id-card-backend-2.onrender.com/user/forgetpassword/code";
 
-        // Create a JSON object to hold the request parameters
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("activationCode", otp);
-            jsonObject.put("password", password);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Toast.makeText(context, "Error creating JSON request", Toast.LENGTH_SHORT).show();
-            return;
+        if(password.equals(confirmPassword)){
+            // Create a JSON object to hold the request parameters
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("activationCode", otp);
+                jsonObject.put("password", password);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(context, "Error creating JSON request", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Create a request queue
+            RequestQueue queue = Volley.newRequestQueue(context);
+
+            // Create a JsonObjectRequest
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            // Handle the response
+                            try {
+                                boolean success = response.getBoolean("succcess");
+                                String message = response.getString("message");
+
+                                if (success) {
+                                    // Password reset successful
+                                    Toast.makeText(context, "Password updated successfully!", Toast.LENGTH_SHORT).show();
+                                    // Navigate to login activity
+                                    Intent intent = new Intent(context, Login.class);
+                                    startActivity(intent);
+                                } else {
+                                    // Password reset failed
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                Toast.makeText(context, "Error parsing response", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            error.printStackTrace();
+                            Toast.makeText(context, "Error resetting password", Toast.LENGTH_SHORT).show();
+                        }
+                    }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    // Add the authorization token to the headers
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("Authorization", token);
+                    return headers;
+                }
+            };
+
+            // Add the request to the RequestQueue
+            queue.add(jsonObjectRequest);
+        }
+        else{
+            Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show();
         }
 
-        // Create a request queue
-        RequestQueue queue = Volley.newRequestQueue(context);
 
-        // Create a JsonObjectRequest
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        // Handle the response
-                        try {
-                            boolean success = response.getBoolean("success");
-                            String message = response.getString("message");
+    }
 
-                            if (success) {
-                                // Password reset successful
-                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-                                // Navigate to login activity
-                                Intent intent = new Intent(context, ResetPassword.class);
-                                startActivity(intent);
-                            } else {
-                                // Password reset failed
-                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            Toast.makeText(context, "Error parsing response", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-                        Toast.makeText(context, "Error resetting password", Toast.LENGTH_SHORT).show();
-                    }
-                }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                // Add the authorization token to the headers
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Authorization", token);
-                return headers;
-            }
-        };
-
-        // Add the request to the RequestQueue
-        queue.add(jsonObjectRequest);
+    @Override
+    public void onBackPressed() {
+        // Empty
     }
 }

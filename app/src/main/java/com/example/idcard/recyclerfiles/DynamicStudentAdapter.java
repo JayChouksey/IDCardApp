@@ -24,6 +24,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.idcard.AddSchool;
 import com.example.idcard.AddStudent;
+import com.example.idcard.EditStudent;
 import com.example.idcard.MainActivity;
 import com.example.idcard.R;
 import com.example.idcard.api.SchoolDeletionHelper;
@@ -124,18 +125,19 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
                     // Handle Edit button click
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        String studentId = studentList.get(position).getValue("_id");
-
+                        String studentStaffId = studentList.get(position).getValue("_id");
+                        String schoolId = studentList.get(position).getValue("school");
+                        String role = studentList.get(position).getValue("role");
                         // Storing id in local storage
                         SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString("studentIdFromListSchool",studentId);
+                        editor.putString("StudentOrStaffIdFromListSchool",studentStaffId);
+                        editor.putString("SchoolIdFromListSchool",schoolId);
+                        editor.putString("Role",role);
                         editor.apply();
 
-                        // Temporary
-                        Toast.makeText(itemView.getContext(), "Error in Editing", Toast.LENGTH_SHORT).show();
-                        // Will do it later
-                        /*Intent intent = new Intent(itemView.getContext(), AddStudent.class);
-                        itemView.getContext().startActivity(intent);*/
+                        Intent intent = new Intent(itemView.getContext(), EditStudent.class);
+                        intent.putExtra("Name",studentList.get(position).getValue("name"));
+                        itemView.getContext().startActivity(intent);
                     }
                 }
             });
@@ -150,7 +152,6 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
                         StudentDeletionHelper.deleteStudent(itemView.getContext(), studentId, token);
                         studentList.remove(position);
                         notifyItemRemoved(position);
-
                     }
                 }
             });
@@ -324,7 +325,7 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
                     data = "Pending";
                 }
 
-                if(!entry.getKey().equals("_id")){
+                if (!entry.getKey().equals("_id") && !entry.getKey().equals("school") && !entry.getKey().equals("role")){
                     // Create LinearLayout
                     LinearLayout linearLayout = new LinearLayout(itemView.getContext());
                     linearLayout.setLayoutParams(new LinearLayout.LayoutParams(

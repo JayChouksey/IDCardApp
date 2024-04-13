@@ -164,7 +164,7 @@ public class ReadyToPrintStudent extends AppCompatActivity {
                                 while (keys.hasNext()) {
                                     String key = keys.next();
                                     if (key.equals("avatar") || key.equals("__v") || key.equals("createdAt") ||
-                                            key.equals("updatedAt") || key.equals("school") || key.equals("photoName")){
+                                            key.equals("updatedAt") || key.equals("user") || key.equals("photoName")) {
                                         continue; // Skip this key
                                     }
                                     String value = studentObject.getString(key);
@@ -236,7 +236,7 @@ public class ReadyToPrintStudent extends AppCompatActivity {
                                 while (keys.hasNext()) {
                                     String key = keys.next();
                                     if (key.equals("avatar") || key.equals("__v") || key.equals("createdAt") ||
-                                            key.equals("updatedAt")) {
+                                            key.equals("updatedAt") || key.equals("user") || key.equals("photoName")) {
                                         continue; // Skip this key
                                     }
                                     String value = studentObject.getString(key);

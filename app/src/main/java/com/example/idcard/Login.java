@@ -50,11 +50,21 @@ public class Login extends AppCompatActivity {
         // Check if the user is already logged in
         if (isLoggedIn()) {
             // Navigate to ProfileActivity
-            Intent intent = new Intent(Login.this,MainActivity.class);
-            String token = getToken();
-            intent.putExtra("token",token);
-            startActivity(intent);
-            finish(); // Close MainActivity
+            if(getRole().equals("distibuter")){
+                Intent intent = new Intent(Login.this,MainActivity.class);
+                String token = getToken();
+                intent.putExtra("token",token);
+                startActivity(intent);
+                finish(); // Close MainActivity
+            }
+            else{
+                Intent intent = new Intent(Login.this,SchoolHome.class);
+                String token = getToken();
+                intent.putExtra("token",token);
+                startActivity(intent);
+                finish(); // Close MainActivity
+            }
+
         }
 
         // ------------------------------------------------------------------------------------------------------------------
@@ -141,6 +151,7 @@ public class Login extends AppCompatActivity {
                                             try {
                                                 JSONObject jsonResponse = new JSONObject(response);
                                                 String token = jsonResponse.getString("token");
+                                                String role = jsonResponse.getString("type");
 
                                                 // Extract user object
                                                 JSONObject userObject = jsonResponse.getJSONObject("user");
@@ -152,6 +163,7 @@ public class Login extends AppCompatActivity {
                                                 // Save token
                                                 saveAuthToken(token);
                                                 saveUserName(name);
+                                                saveRole(role);
 
                                                 // Start the Profile activity
                                                 Intent intent = new Intent(Login.this, MainActivity.class);
@@ -210,8 +222,92 @@ public class Login extends AppCompatActivity {
                         }
                     }
                     else{
-                        Intent intent = new Intent(Login.this, SchoolHome.class);
-                        startActivity(intent);
+                        if (!loginID.isEmpty() && !password.isEmpty()) {
+                            // Create a request body with URL-encoded form data
+                            String requestBody = "email=" + URLEncoder.encode(loginID, StandardCharsets.UTF_8)
+                                    + "&password=" + URLEncoder.encode(password, StandardCharsets.UTF_8);
+
+                            // Make POST request using Volley
+                            String api = "https://id-card-backend-2.onrender.com/user/school/login"; // login API endpoint
+                            StringRequest request = new StringRequest(Request.Method.POST, api,
+                                    new Response.Listener<String>() {
+                                        @Override
+                                        public void onResponse(String response) {
+                                            // Handle response
+                                            try {
+                                                JSONObject jsonResponse = new JSONObject(response);
+                                                String token = jsonResponse.getString("token");
+                                                String role = jsonResponse.getString("type");
+
+                                                // Extract user object
+                                                JSONObject userObject = jsonResponse.getJSONObject("school");
+                                                // Extract name from user object
+                                                String name = userObject.getString("name");
+                                                String schoolId = userObject.getString("_id");
+
+                                                // Save login status
+                                                saveLoginStatus(true);
+                                                // Save token and other required parameters
+                                                saveAuthToken(token);
+                                                saveUserName(name);
+                                                saveSchoolId(schoolId);
+                                                saveRole(role);
+
+                                                // Start the Profile activity
+                                                Intent intent = new Intent(Login.this, SchoolHome.class);
+                                                intent.putExtra("token", token);
+                                                startActivity(intent);
+
+                                            } catch (JSONException e) {
+                                                loginButton.setText("Login");
+                                                e.printStackTrace();
+                                                // Unexpected response format, show an error message
+                                                Toast.makeText(Login.this, "Unexpected response. Please try again.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    },
+                                    new Response.ErrorListener() {
+                                        @Override
+                                        public void onErrorResponse(VolleyError error) {
+
+                                            loginButton.setText("Login");
+                                            // Handle error
+                                            if (error.networkResponse != null && error.networkResponse.data != null) {
+                                                String errorMessage = new String(error.networkResponse.data);
+                                                if (errorMessage.contains("Wrong Credientials")) {
+                                                    // Password doesn't match, display toast message
+                                                    Toast.makeText(Login.this, "Incorrect password. Please try again.", Toast.LENGTH_SHORT).show();
+                                                } else if (errorMessage.contains("User Not Found")) {
+                                                    // User not found, display toast message
+                                                    Toast.makeText(Login.this, "User not found. Please check your credentials.", Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    // Other errors, show a generic error message
+                                                    Toast.makeText(Login.this, "Login failed. Please try again.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            } else {
+                                                // No response from server, show a generic error message
+                                                Toast.makeText(Login.this, "Login failed. Please try again.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    }) {
+                                @Override
+                                public byte[] getBody() {
+                                    return requestBody.getBytes(StandardCharsets.UTF_8);
+                                }
+
+                                @Override
+                                public String getBodyContentType() {
+                                    return "application/x-www-form-urlencoded";
+                                }
+                            };
+
+                            // Add request to Volley request queue
+                            Volley.newRequestQueue(Login.this).add(request);
+                        } else {
+                            loginButton.setText("Login");
+                            // If any field is empty, show a message to the user
+                            Toast.makeText(Login.this, "Please fill in all fields.", Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     // Make sure fields are not empty
@@ -254,6 +350,25 @@ public class Login extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("name", name);
         editor.apply();
+    }
+
+    private void saveRole(String role) {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("role", role);
+        editor.apply();
+    }
+
+    private void saveSchoolId(String id) {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("_schoolId", id);
+        editor.apply();
+    }
+
+    private String getRole() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("role", "");
     }
 
     private String getToken() {

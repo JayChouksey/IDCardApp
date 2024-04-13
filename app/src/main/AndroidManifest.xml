@@ -20,6 +20,15 @@
         android:theme="@style/Theme.IDCard"
         tools:targetApi="31">
         <activity
+            android:name=".ViewDataForSchool"
+            android:exported="false" />
+        <activity
+            android:name=".AddDataForSchool"
+            android:exported="false" />
+        <activity
+            android:name=".EditStudent"
+            android:exported="false" />
+        <activity
             android:name=".SchoolHome"
             android:exported="false" />
         <activity

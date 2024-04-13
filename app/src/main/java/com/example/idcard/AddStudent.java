@@ -62,7 +62,6 @@ public class AddStudent extends AppCompatActivity {
 
     AutoCompleteTextView autoCompleteSchool, autoCompleteRole;
     ArrayAdapter<String> adapterSchool, adapterRole;
-    TextView textView; // to test
     Button buttonAdd;
     Button buttonChooseImage;
     TextView textNoFileChosen;
@@ -72,7 +71,6 @@ public class AddStudent extends AppCompatActivity {
 
     private HashMap<String, String> fieldValueMap = new HashMap<>(); // for Student
     private HashMap<String, String> fieldValueMapStaff = new HashMap<>(); // for Staff
-
     LinearLayout dynamicLayout; // Dynamic layout for add students data
     LinearLayout buttonLayout;
     @Override
@@ -550,8 +548,6 @@ public class AddStudent extends AppCompatActivity {
                     @Override
                     public void onResponse(NetworkResponse response) {
                         Toast.makeText(AddStudent.this, "Student added successfully", Toast.LENGTH_SHORT).show();
-                        // will change later
-                        textView.setText("Add Student");
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -691,9 +687,7 @@ public class AddStudent extends AppCompatActivity {
                 new Response.Listener<NetworkResponse>() {
                     @Override
                     public void onResponse(NetworkResponse response) {
-                        Toast.makeText(AddStudent.this, "Student added successfully", Toast.LENGTH_SHORT).show();
-                        // will change later
-                        textView.setText("Add Student");
+                        Toast.makeText(AddStudent.this, "Staff added successfully", Toast.LENGTH_SHORT).show();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -703,7 +697,7 @@ public class AddStudent extends AppCompatActivity {
                     String errorMessage = new String(error.networkResponse.data);
                     Toast.makeText(AddStudent.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(AddStudent.this, "Error adding student", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddStudent.this, "Error adding staff", Toast.LENGTH_SHORT).show();
                 }
                 // Handle error response
             }

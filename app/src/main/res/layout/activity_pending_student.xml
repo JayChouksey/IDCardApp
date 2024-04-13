@@ -68,6 +68,22 @@
     </androidx.cardview.widget.CardView>
     <!-- End of toolbar -->
 
+<!--    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/icon_more_options"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:id="@+id/showOptions"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:text="Show Options"
+        android:layout_gravity="center"
+        android:textSize="8sp"
+        android:textStyle="bold"
+        android:textColor="#F44336"/>-->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -81,7 +97,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
+            app:cardElevation="4dp"
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
