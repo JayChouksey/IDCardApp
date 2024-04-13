@@ -1,6 +1,7 @@
 package com.example.idcard.recyclerfiles;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class DynamicStudent {
@@ -11,7 +12,7 @@ public class DynamicStudent {
 
 
     public DynamicStudent() {
-        this.fields = new HashMap<>();
+        this.fields = new LinkedHashMap<>();
         this.isSelected = false; // Default selection status is false
     }
 
