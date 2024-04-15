@@ -1,9 +1,12 @@
 package com.example.idcard;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
@@ -35,6 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -130,7 +134,8 @@ public class PrintedStudent extends AppCompatActivity {
         downloadImages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                downloadImages(PrintedStudent.this);
+                Toast.makeText(PrintedStudent.this, "Error from server side", Toast.LENGTH_SHORT).show();
+                //downloadImages(PrintedStudent.this);
             }
         });
 
@@ -289,45 +294,32 @@ public class PrintedStudent extends AppCompatActivity {
     // Download image and excel
     public void downloadExcelFile(Context context) {
         String schoolId = getId();
-        String url = "https://id-card-backend-2.onrender.com/user/excel/data/" + schoolId;
+        String url = "https://id-card-backend-2.onrender.com/user/excel/data/" + schoolId + "/?status=Printed";
 
-        // Instantiate the RequestQueue
-        RequestQueue queue = Volley.newRequestQueue(context);
+        // Get the directory for the user's public directory
+        File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        if (!directory.exists()) {
+            directory.mkdirs(); // Create if it doesn't exist
+        }
 
-        // Create a StringRequest with POST method
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Handle successful response (if needed)
-                        Toast.makeText(context, "Excel file downloaded successfully", Toast.LENGTH_SHORT).show();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // Handle errors
-                Toast.makeText(context, "Failed to download excel file", Toast.LENGTH_SHORT).show();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                // Add headers here
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Authorization", getToken());
-                return headers;
-            }
+        // Create a download manager request
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        request.setTitle("Excel File");
+        request.setDescription("Downloading");
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setAllowedOverMetered(true); // Allow download over metered connections
+        request.setAllowedOverRoaming(true); // Allow download over roaming connections
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Printed Data.xlsx");
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                // Add parameters here (if needed)
-                Map<String, String> params = new HashMap<>();
-                params.put("status", "Ready to print");
-                return params;
-            }
-        };
+        // Add headers to the request
+        request.addRequestHeader("Authorization", getToken());
 
-        // Add the request to the RequestQueue
-        queue.add(stringRequest);
+        // Get the download manager and enqueue the request
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        long downloadId = downloadManager.enqueue(request);
+
+        // Optionally, you can listen for download completion to show a toast message
+        // using BroadcastReceiver or DownloadManager.Query
     }
 
     public void downloadImages(Context context) {
