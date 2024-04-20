@@ -29,7 +29,6 @@ import com.example.idcard.MainActivity;
 import com.example.idcard.R;
 import com.example.idcard.api.SchoolDeletionHelper;
 import com.example.idcard.api.StudentDeletionHelper;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.Map;

@@ -31,6 +31,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.idcard.ImageDownloadHelper.ImageDownloader;
 import com.example.idcard.recyclerfiles.DynamicStudent;
 import com.example.idcard.recyclerfiles.DynamicStudentAdapter;
 
@@ -128,14 +129,23 @@ public class PrintedStudent extends AppCompatActivity {
         exportExcel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                downloadExcelFile(PrintedStudent.this);
+                if(role.equals("Student")) {
+                    downloadExcelFile(PrintedStudent.this);
+                }
+                else{
+                    downloadExcelFileStaff(PrintedStudent.this);
+                }
             }
         });
         downloadImages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(PrintedStudent.this, "Error from server side", Toast.LENGTH_SHORT).show();
-                //downloadImages(PrintedStudent.this);
+                if(role.equals("Student")) {
+                    downloadImages(PrintedStudent.this);
+                }
+                else{
+                    downloadImagesStaff(PrintedStudent.this);
+                }
             }
         });
 
@@ -309,7 +319,37 @@ public class PrintedStudent extends AppCompatActivity {
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.setAllowedOverMetered(true); // Allow download over metered connections
         request.setAllowedOverRoaming(true); // Allow download over roaming connections
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Printed Data.xlsx");
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Printed Student Data.xlsx");
+
+        // Add headers to the request
+        request.addRequestHeader("Authorization", getToken());
+
+        // Get the download manager and enqueue the request
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        long downloadId = downloadManager.enqueue(request);
+
+        // Optionally, you can listen for download completion to show a toast message
+        // using BroadcastReceiver or DownloadManager.Query
+    }
+
+    public void downloadExcelFileStaff(Context context) {
+        String schoolId = getId();
+        String url = "https://id-card-backend-2.onrender.com/user/staff/excel/data/" + schoolId + "/?status=Printed";
+
+        // Get the directory for the user's public directory
+        File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        if (!directory.exists()) {
+            directory.mkdirs(); // Create if it doesn't exist
+        }
+
+        // Create a download manager request
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        request.setTitle("Excel File");
+        request.setDescription("Downloading");
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setAllowedOverMetered(true); // Allow download over metered connections
+        request.setAllowedOverRoaming(true); // Allow download over roaming connections
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Printed Staff Data.xlsx");
 
         // Add headers to the request
         request.addRequestHeader("Authorization", getToken());
@@ -323,29 +363,93 @@ public class PrintedStudent extends AppCompatActivity {
     }
 
     public void downloadImages(Context context) {
+        String schoolId = getId();
 
-        String url = "fkl";
-        // Instantiate the RequestQueue
+        String url = "https://id-card-backend-2.onrender.com/user/student/images/" + schoolId + "/?status=Printed";
         RequestQueue queue = Volley.newRequestQueue(context);
 
-        // Request a string response from the provided URL
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, null,
+                new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(String response) {
-                        // Handle successful response (if needed)
-                        Toast.makeText(context, "Images downloading started successfully", Toast.LENGTH_SHORT).show();
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray studentImages = response.getJSONArray("studentImages");
+                            for (int i = 0; i < studentImages.length(); i++) {
+                                String imageUrl = studentImages.getString(i);
+                                String folderName = "Printed Student Images";
+                                ImageDownloader.downloadImage(context, imageUrl, folderName);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                // Handle errors
-                Toast.makeText(context, "Failed to download images", Toast.LENGTH_SHORT).show();
+                error.printStackTrace();
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    String errorMessage = new String(error.networkResponse.data);
+                    Toast.makeText(context, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "Failed to fetch image URLs", Toast.LENGTH_SHORT).show();
+                }
             }
-        });
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                // Add your headers here
+                headers.put("Authorization", getToken());
+                return headers;
+            }
+        };
 
-        // Add the request to the RequestQueue
-        queue.add(stringRequest);
+        queue.add(jsonObjectRequest);
+    }
+
+    public void downloadImagesStaff(Context context) {
+        String schoolId = getId();
+
+        String url = "https://id-card-backend-2.onrender.com/user/staff/images/" + schoolId + "/?status=Panding";
+        RequestQueue queue = Volley.newRequestQueue(context);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray studentImages = response.getJSONArray("staffImages");
+                            for (int i = 0; i < studentImages.length(); i++) {
+                                String imageUrl = studentImages.getString(i);
+                                String folderName = "Printed Staff Images";
+                                ImageDownloader.downloadImage(context, imageUrl, folderName);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    String errorMessage = new String(error.networkResponse.data);
+                    Toast.makeText(context, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "Failed to fetch image URLs", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                // Add your headers here
+                headers.put("Authorization", getToken());
+                return headers;
+            }
+        };
+
+        queue.add(jsonObjectRequest);
     }
     // End of Download image and excel
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -25,8 +26,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
+
 import com.android.volley.toolbox.Volley;
+import com.example.idcard.ImageDownloadHelper.ImageDownloader;
 import com.example.idcard.recyclerfiles.DynamicStudent;
 import com.example.idcard.recyclerfiles.DynamicStudentAdapter;
 
@@ -35,8 +37,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -127,13 +127,23 @@ public class PendingStudent extends AppCompatActivity {
         exportExcel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                downloadExcelFile(PendingStudent.this);
+                if(role.equals("Student")) {
+                    downloadExcelFile(PendingStudent.this);
+                }
+                else{
+                    downloadExcelFileStaff(PendingStudent.this);
+                }
             }
         });
         downloadImages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                downloadImages(PendingStudent.this);
+                if(role.equals("Student")) {
+                    downloadImages(PendingStudent.this);
+                }
+                else{
+                    downloadImagesStaff(PendingStudent.this);
+                }
             }
         });
 
@@ -311,7 +321,37 @@ public class PendingStudent extends AppCompatActivity {
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.setAllowedOverMetered(true); // Allow download over metered connections
         request.setAllowedOverRoaming(true); // Allow download over roaming connections
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Pending Data.xlsx");
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Pending Student Data.xlsx");
+
+        // Add headers to the request
+        request.addRequestHeader("Authorization", getToken());
+
+        // Get the download manager and enqueue the request
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        long downloadId = downloadManager.enqueue(request);
+
+        // Optionally, you can listen for download completion to show a toast message
+        // using BroadcastReceiver or DownloadManager.Query
+    }
+
+    public void downloadExcelFileStaff(Context context) {
+        String schoolId = getId();
+        String url = "https://id-card-backend-2.onrender.com/user/staff/excel/data/" + schoolId + "/?status=Panding";
+
+        // Get the directory for the user's public directory
+        File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        if (!directory.exists()) {
+            directory.mkdirs(); // Create if it doesn't exist
+        }
+
+        // Create a download manager request
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        request.setTitle("Excel File");
+        request.setDescription("Downloading");
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setAllowedOverMetered(true); // Allow download over metered connections
+        request.setAllowedOverRoaming(true); // Allow download over roaming connections
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Pending Staff Data.xlsx");
 
         // Add headers to the request
         request.addRequestHeader("Authorization", getToken());
@@ -326,35 +366,93 @@ public class PendingStudent extends AppCompatActivity {
 
     public void downloadImages(Context context) {
         String schoolId = getId();
-        String url = "https://id-card-backend-2.onrender.com/user/student/images/" + schoolId;
 
+        String url = "https://id-card-backend-2.onrender.com/user/student/images/" + schoolId + "/?status=Panding";
+        RequestQueue queue = Volley.newRequestQueue(context);
 
-        // Get the directory for the user's public directory
-        File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        if (!directory.exists()) {
-            directory.mkdirs(); // Create if it doesn't exist
-        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray studentImages = response.getJSONArray("studentImages");
+                            for (int i = 0; i < studentImages.length(); i++) {
+                                String imageUrl = studentImages.getString(i);
+                                String folderName = "Pending Student Images";
+                                ImageDownloader.downloadImage(context, imageUrl, folderName);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    String errorMessage = new String(error.networkResponse.data);
+                    Toast.makeText(context, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "Failed to fetch image URLs", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                // Add your headers here
+                headers.put("Authorization", getToken());
+                return headers;
+            }
+        };
 
-        // Create a download manager request
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        request.setTitle("Images Zip");
-        request.setDescription("Downloading");
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setAllowedOverMetered(true); // Allow download over metered connections
-        request.setAllowedOverRoaming(true); // Allow download over roaming connections
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Pending student images.zip");
-
-        // Add headers to the request
-        request.addRequestHeader("Authorization", getToken());
-
-        // Get the download manager and enqueue the request
-        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        long downloadId = downloadManager.enqueue(request);
-
-        // Optionally, you can listen for download completion to show a toast message
-        // using BroadcastReceiver or DownloadManager.Query
+        queue.add(jsonObjectRequest);
     }
 
+    public void downloadImagesStaff(Context context) {
+        String schoolId = getId();
+
+        String url = "https://id-card-backend-2.onrender.com/user/staff/images/" + schoolId + "/?status=Panding";
+        RequestQueue queue = Volley.newRequestQueue(context);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray studentImages = response.getJSONArray("staffImages");
+                            for (int i = 0; i < studentImages.length(); i++) {
+                                String imageUrl = studentImages.getString(i);
+                                String folderName = "Pending Staff Images";
+                                ImageDownloader.downloadImage(context, imageUrl, folderName);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    String errorMessage = new String(error.networkResponse.data);
+                    Toast.makeText(context, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "Failed to fetch image URLs", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                // Add your headers here
+                headers.put("Authorization", getToken());
+                return headers;
+            }
+        };
+
+        queue.add(jsonObjectRequest);
+    }
     // End of Download image and excel
 
     // Method to update school list recycler view

@@ -21,7 +21,7 @@ import com.example.idcard.R;
 import java.util.List;
 
 import com.example.idcard.api.SchoolDeletionHelper;
-import com.squareup.picasso.Picasso;
+
 
 public class SchoolInfoAdapter extends RecyclerView.Adapter<SchoolInfoAdapter.ViewHolder> {
 
