@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
@@ -54,7 +55,6 @@ public class EditStudent extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_student);
-
 
         // Setting the distributor name
         TextView userName = findViewById(R.id.userName);
@@ -201,10 +201,14 @@ public class EditStudent extends AppCompatActivity {
              */
             @Override
             public Map<String, DataPart> getByteData() {
-                Map<String, DataPart> params = new HashMap<>();
-                long imagename = System.currentTimeMillis();
-                params.put("file", new DataPart(imagename + ".jpeg", getFileDataFromDrawable(bitmap)));
-                return params;
+                if (bitmap != null) {
+                    Map<String, DataPart> params = new HashMap<>();
+                    long imagename = System.currentTimeMillis();
+                    params.put("file", new DataPart(imagename + ".jpeg", getFileDataFromDrawable(bitmap)));
+                    return params;
+                } else {
+                    return null; // Return null if no photo is selected
+                }
             }
 
             @Override
@@ -341,10 +345,14 @@ public class EditStudent extends AppCompatActivity {
              */
             @Override
             public Map<String, DataPart> getByteData() {
-                Map<String, DataPart> params = new HashMap<>();
-                long imagename = System.currentTimeMillis();
-                params.put("file", new DataPart(imagename + ".jpeg", getFileDataFromDrawable(bitmap)));
-                return params;
+                if (bitmap != null) {
+                    Map<String, DataPart> params = new HashMap<>();
+                    long imagename = System.currentTimeMillis();
+                    params.put("file", new DataPart(imagename + ".jpeg", getFileDataFromDrawable(bitmap)));
+                    return params;
+                } else {
+                    return null; // Return null if no photo is selected
+                }
             }
 
             @Override
@@ -369,6 +377,25 @@ public class EditStudent extends AppCompatActivity {
     private void fetchRequiredFields() {
         String url = "https://id-card-backend-2.onrender.com/user/school/requiredfields/" + getSchoolId();
 
+        // Collecting data from last activity to show in EditText
+        Intent intent = getIntent();
+        String name = intent.getStringExtra("Name");
+        String fatherName = intent.getStringExtra("Father's Name");
+        String dob = intent.getStringExtra("Date of Birth");
+        String address = intent.getStringExtra("Address");
+        String contact = intent.getStringExtra("Contact No.");
+        String bloodGroup = intent.getStringExtra("Blood Group");
+        String motherName = intent.getStringExtra("Mother's Name");
+        String classs = intent.getStringExtra("Class");
+        String section = intent.getStringExtra("Section");
+        String rollNo = intent.getStringExtra("Roll No.");
+        String admissionNo = intent.getStringExtra("Admission No.");
+        String studentID = intent.getStringExtra("Student ID");
+        String aadharNo = intent.getStringExtra("Aadhar No.");
+        String ribbonColour = intent.getStringExtra("Ribbon Colour");
+        String routeNo = intent.getStringExtra("Route No.");
+        String modeOfTransport = intent.getStringExtra("Mode of Transport");
+
         // Instantiate the RequestQueue
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -385,52 +412,66 @@ public class EditStudent extends AppCompatActivity {
                                     for (String field : fields) {
                                         switch (field.trim()) {
                                             case "Student Name":
-                                                addField("Student Name", "Enter Student name", "studentName");
+                                                addField("Student Name", "Enter Student name",
+                                                        "studentName",name);
                                                 break;
                                             case "Father's Name":
-                                                addField("Father's Name", "Enter Father name", "fatherName");
+                                                addField("Father's Name", "Enter Father name",
+                                                        "fatherName", fatherName);
                                                 break;
                                             case "Mother's Name":
-                                                addField("Mother's Name", "Enter Mother Name", "motherName");
+                                                addField("Mother's Name", "Enter Mother Name",
+                                                        "motherName",motherName);
                                                 break;
                                             case "Date of Birth":
-                                                addField("Date of Birth", "Enter Date of Birth", "dob");
+                                                addField("Date of Birth", "Enter Date of Birth",
+                                                        "dob",dob);
                                                 break;
                                             case "Contact No.":
-                                                addField("Contact No.", "Enter Contact No.", "contact");
+                                                addField("Contact No.", "Enter Contact No.",
+                                                        "contact",contact);
                                                 break;
                                             case "Address":
-                                                addField("Address", "Enter Address", "address");
+                                                addField("Address", "Enter Address",
+                                                        "address",address);
                                                 break;
                                             case "Class":
-                                                addField("Class", "Enter Class", "class");
+                                                addField("Class", "Enter Class", "class",classs);
                                                 break;
                                             case "Section":
-                                                addField("Section", "Enter Section", "section");
+                                                addField("Section", "Enter Section", "section",section);
                                                 break;
                                             case "Roll No.":
-                                                addField("Roll No.", "Enter Roll No.", "rollNo");
+                                                addField("Roll No.", "Enter Roll No.",
+                                                        "rollNo",rollNo);
                                                 break;
                                             case "Admission No.":
-                                                addField("Admission No.", "Enter Admission No.", "admissionNo");
+                                                addField("Admission No.", "Enter Admission No.",
+                                                        "admissionNo",admissionNo);
                                                 break;
                                             case "Student ID":
-                                                addField("Student ID", "Enter Student ID", "studentID");
+                                                addField("Student ID", "Enter Student ID",
+                                                        "studentID",studentID);
                                                 break;
                                             case "Aadhar No.":
-                                                addField("Aadhar No.", "Enter Aadhar No.", "aadharNo");
+                                                addField("Aadhar No.", "Enter Aadhar No.",
+                                                        "aadharNo",aadharNo);
                                                 break;
                                             case "Blood Group":
-                                                addField("Blood Group", "Enter Blood Group", "bloodGroup");
+                                                addField("Blood Group", "Enter Blood Group",
+                                                        "bloodGroup",bloodGroup);
                                                 break;
                                             case "Ribbon Colour":
-                                                addField("Ribbon Colour", "Enter Ribbon Colour", "ribbonColour");
+                                                addField("Ribbon Colour", "Enter Ribbon Colour",
+                                                        "ribbonColour",ribbonColour);
                                                 break;
                                             case "Route No.":
-                                                addField("Route No.", "Enter Route No.", "routeNo");
+                                                addField("Route No.", "Enter Route No.",
+                                                        "routeNo",routeNo);
                                                 break;
                                             case "Mode of Transport":
-                                                addField("Mode of Transport", "Enter Mode of Transport", "modeOfTransport");
+                                                addField("Mode of Transport", "Enter Mode of Transport",
+                                                        "modeOfTransport",modeOfTransport);
                                                 break;
                                         }
                                     }
@@ -476,6 +517,29 @@ public class EditStudent extends AppCompatActivity {
     private void fetchRequiredFieldsStaff() {
         String url = "https://id-card-backend-2.onrender.com/user/school/requiredfields/" + getSchoolId();
 
+        // Collecting data from last activity to show in EditText
+        Intent intent = getIntent();
+        String name = intent.getStringExtra("Name");
+        String fatherName = intent.getStringExtra("Father's Name");
+        String husbandName = intent.getStringExtra("Husband's Name");
+        String dob = intent.getStringExtra("Date of Birth");
+        String qualification = intent.getStringExtra("Qualification");
+        String designation = intent.getStringExtra("Designation");
+        String doj = intent.getStringExtra("Date of Joining");
+        String staffType = intent.getStringExtra("Staff Type");
+        String address = intent.getStringExtra("Address");
+        String contact = intent.getStringExtra("Contact No.");
+        String uid = intent.getStringExtra("UID No.");
+        String email = intent.getStringExtra("E-mail");
+        String staffID = intent.getStringExtra("Staff ID");
+        String udiseCode = intent.getStringExtra("UDISE Code");
+        String schoolName = intent.getStringExtra("School Name");
+        String bloodGroup = intent.getStringExtra("Blood Group");
+        String dispatchNo = intent.getStringExtra("Dispatch No.");
+        String dateOfIssue = intent.getStringExtra("Date of Issue");
+        String ihrmsNo = intent.getStringExtra("IHRMS No.");
+        String beltNo = intent.getStringExtra("Belt No.");
+
         // Instantiate the RequestQueue
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -492,64 +556,84 @@ public class EditStudent extends AppCompatActivity {
                                     for (String field : fields) {
                                         switch (field.trim()) {
                                             case "Name":
-                                                addFieldStaff("Name", "Enter name", "name");
+                                                addFieldStaff("Name", "Enter name",
+                                                        "name",name);
                                                 break;
                                             case "Father's Name":
-                                                addFieldStaff("Father's Name", "Enter Father's name", "fatherName");
+                                                addFieldStaff("Father's Name", "Enter Father's name",
+                                                        "fatherName",fatherName);
                                                 break;
                                             case "Husband's Name":
-                                                addFieldStaff("Husband's Name", "Enter Husband's Name", "husbandName");
+                                                addFieldStaff("Husband's Name", "Enter Husband's Name",
+                                                        "husbandName",husbandName);
                                                 break;
                                             case "Date of Birth":
-                                                addFieldStaff("Date of Birth", "Enter Date of Birth", "dob");
+                                                addFieldStaff("Date of Birth", "Enter Date of Birth",
+                                                        "dob",dob);
                                                 break;
                                             case "Qualification":
-                                                addFieldStaff("Qualification", "Enter Qualification", "qualification");
+                                                addFieldStaff("Qualification", "Enter Qualification",
+                                                        "qualification",qualification);
                                                 break;
                                             case "Designation":
-                                                addFieldStaff("Designation", "Enter Designation", "designation");
+                                                addFieldStaff("Designation", "Enter Designation",
+                                                        "designation",designation);
                                                 break;
                                             case "Date of Joining":
-                                                addFieldStaff("Date of Joining", "Enter Date of Joining", "doj");
+                                                addFieldStaff("Date of Joining", "Enter Date of Joining",
+                                                        "doj",doj);
                                                 break;
                                             case "Staff Type":
-                                                addFieldStaff("Staff Type", "Enter Staff Type", "staffType");
+                                                addFieldStaff("Staff Type", "Enter Staff Type",
+                                                        "staffType",staffType);
                                                 break;
                                             case "Address":
-                                                addFieldStaff("Address", "Enter Address", "address");
+                                                addFieldStaff("Address", "Enter Address",
+                                                        "address",address);
                                                 break;
                                             case "Contact No.":
-                                                addFieldStaff("Contact No.", "Enter Contact No.", "contact");
+                                                addFieldStaff("Contact No.", "Enter Contact No.",
+                                                        "contact",contact);
                                                 break;
                                             case "UID No.":
-                                                addFieldStaff("UID No.", "Enter UID No.", "UIDNo");
+                                                addFieldStaff("UID No.", "Enter UID No.",
+                                                        "UIDNo",uid);
                                                 break;
                                             case "E-mail":
-                                                addFieldStaff("E-mail", "Enter Email", "email");
+                                                addFieldStaff("E-mail", "Enter Email",
+                                                        "email",email);
                                                 break;
                                             case "Staff ID":
-                                                addFieldStaff("Staff ID", "Enter Staff ID", "staffID");
+                                                addFieldStaff("Staff ID", "Enter Staff ID",
+                                                        "staffID",staffID);
                                                 break;
-                                            case "USIDE Code":
-                                                addFieldStaff("USIDE Code", "Enter USIDE Code", "USIDECode");
+                                            case "UDISE Code":
+                                                addFieldStaff("UDISE Code", "Enter UDISE Code",
+                                                        "UDISECode",udiseCode);
                                                 break;
                                             case "Office Name":
-                                                addFieldStaff("Office Name", "Enter Office Name", "officeName");
+                                                addFieldStaff("Office Name", "Enter Office Name",
+                                                        "officeName",schoolName);
                                                 break;
                                             case "Blood Group":
-                                                addFieldStaff("Blood Group", "Enter Blood Group", "bloodGroup");
+                                                addFieldStaff("Blood Group", "Enter Blood Group",
+                                                        "bloodGroup",bloodGroup);
                                                 break;
                                             case "Dispatch No.":
-                                                addFieldStaff("Address", "Enter Address", "address");
+                                                addFieldStaff("Dispatch No.", "Enter Dispatch No.",
+                                                        "dispatcNo",dispatchNo);
                                                 break;
                                             case "Date of Issue":
-                                                addFieldStaff("Date of Issue", "Enter Date of Issue", "doi");
+                                                addFieldStaff("Date of Issue", "Enter Date of Issue",
+                                                        "doi",dateOfIssue);
                                                 break;
                                             case "IHRMS No.":
-                                                addFieldStaff("IHRMS No.", "Enter IHRMS No.", "IHRMSNo");
+                                                addFieldStaff("IHRMS No.", "Enter IHRMS No.",
+                                                        "IHRMSNo",ihrmsNo);
                                                 break;
                                             case "Belt No.":
-                                                addFieldStaff("Belt No.", "Enter Belt No.", "beltNo");
+                                                addFieldStaff("Belt No.", "Enter Belt No.",
+                                                        "beltNo",beltNo);
                                                 break;
                                         }
                                     }
@@ -592,7 +676,7 @@ public class EditStudent extends AppCompatActivity {
 
     // ------------------------------------------------------------------------------------------------------------------------
     // Add Field function
-    private void addField(String label, String hint, String fieldIdentifier) {
+    private void addField(String label, String hint, String fieldIdentifier, String text) {
         // Create a new TextView dynamically for label
         TextView textView = new TextView(EditStudent.this);
         textView.setLayoutParams(new LinearLayout.LayoutParams(
@@ -610,6 +694,12 @@ public class EditStudent extends AppCompatActivity {
         editText.setBackgroundResource(R.drawable.edittext_background);
         editText.setPadding(30, 30, 30, 30);
         editText.setHint(hint);
+        // Set text if not empty
+        if (!TextUtils.isEmpty(text)) {
+            editText.setText(text);
+            // Manually add initial text to fieldValueMapStaff
+            fieldValueMapStaff.put(fieldIdentifier, text);
+        }
 
         // Add a text change listener to update the HashMap when the text changes
         editText.addTextChangedListener(new TextWatcher() {
@@ -631,7 +721,7 @@ public class EditStudent extends AppCompatActivity {
         dynamicLayout.addView(editText);
     }
 
-    private void addFieldStaff(String label, String hint, String fieldIdentifier) {
+    private void addFieldStaff(String label, String hint, String fieldIdentifier, String text) {
         // Create a new TextView dynamically for label
         TextView textView = new TextView(EditStudent.this);
         textView.setLayoutParams(new LinearLayout.LayoutParams(
@@ -649,6 +739,12 @@ public class EditStudent extends AppCompatActivity {
         editText.setBackgroundResource(R.drawable.edittext_background);
         editText.setPadding(30, 30, 30, 30);
         editText.setHint(hint);
+        // Set text if not empty
+        if (!TextUtils.isEmpty(text)) {
+            editText.setText(text);
+            // Manually add initial text to fieldValueMapStaff
+            fieldValueMapStaff.put(fieldIdentifier, text);
+        }
 
         // Add a text change listener to update the HashMap when the text changes
         editText.addTextChangedListener(new TextWatcher() {

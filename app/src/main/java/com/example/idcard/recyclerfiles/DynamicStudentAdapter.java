@@ -28,6 +28,7 @@ import com.example.idcard.EditStudent;
 import com.example.idcard.MainActivity;
 import com.example.idcard.R;
 import com.example.idcard.api.SchoolDeletionHelper;
+import com.example.idcard.api.StaffDeletionHelper;
 import com.example.idcard.api.StudentDeletionHelper;
 
 import java.util.List;
@@ -136,6 +137,37 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
 
                         Intent intent = new Intent(itemView.getContext(), EditStudent.class);
                         intent.putExtra("Name",studentList.get(position).getValue("name"));
+                        intent.putExtra("Father's Name",studentList.get(position).getValue("fatherName"));
+                        intent.putExtra("Husband's Name",studentList.get(position).getValue("husbandName"));
+                        intent.putExtra("Date of Birth", studentList.get(position).getValue("dob"));
+                        intent.putExtra("Qualification", studentList.get(position).getValue("qualification"));
+                        intent.putExtra("Designation", studentList.get(position).getValue("designation"));
+                        intent.putExtra("Date of Joining", studentList.get(position).getValue("doj"));
+                        intent.putExtra("Staff Type", studentList.get(position).getValue("staffType"));
+                        intent.putExtra("Address", studentList.get(position).getValue("address"));
+                        intent.putExtra("Contact No.", studentList.get(position).getValue("contact"));
+                        intent.putExtra("UID No.", studentList.get(position).getValue("uid"));
+                        intent.putExtra("E-mail", studentList.get(position).getValue("email"));
+                        intent.putExtra("Staff ID", studentList.get(position).getValue("staffID"));
+                        intent.putExtra("UDISE Code", studentList.get(position).getValue("udiseCode"));
+                        intent.putExtra("School Name", studentList.get(position).getValue("schoolName"));
+                        intent.putExtra("Blood Group", studentList.get(position).getValue("bloodGroup"));
+                        intent.putExtra("Dispatch No.", studentList.get(position).getValue("dispatchNo"));
+                        intent.putExtra("Date of Issue", studentList.get(position).getValue("dateOfissue"));
+                        intent.putExtra("IHRMS No.", studentList.get(position).getValue("ihrmsNo"));
+                        intent.putExtra("Belt No.", studentList.get(position).getValue("beltNo"));
+                        intent.putExtra("Student Name", studentList.get(position).getValue("studentName"));
+                        intent.putExtra("Mother's Name", studentList.get(position).getValue("motherName"));
+                        intent.putExtra("Class", studentList.get(position).getValue("class"));
+                        intent.putExtra("Section", studentList.get(position).getValue("section"));
+                        intent.putExtra("Roll No.", studentList.get(position).getValue("rollNo"));
+                        intent.putExtra("Admission No.", studentList.get(position).getValue("admissionNo"));
+                        intent.putExtra("Student ID", studentList.get(position).getValue("studentID"));
+                        intent.putExtra("Aadhar No.", studentList.get(position).getValue("aadharNo"));
+                        intent.putExtra("Ribbon Colour", studentList.get(position).getValue("ribbonColour"));
+                        intent.putExtra("Route No.", studentList.get(position).getValue("routeNo"));
+                        intent.putExtra("Mode of Transport", studentList.get(position).getValue("modeOfTransport"));
+
                         itemView.getContext().startActivity(intent);
                     }
                 }
@@ -147,8 +179,16 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
                     // Handle Delete button click
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        String studentId = studentList.get(position).getValue("_id");
-                        StudentDeletionHelper.deleteStudent(itemView.getContext(), studentId, token);
+                        String studentStaffId = studentList.get(position).getValue("_id");
+                        String role = studentList.get(position).getValue("role");
+
+                        if(role.equals("student")){
+                            StudentDeletionHelper.deleteStudent(itemView.getContext(), studentStaffId, token);
+                        }
+                        else{
+                            StaffDeletionHelper.deleteStudent(itemView.getContext(), studentStaffId, token);
+                        }
+
                         studentList.remove(position);
                         notifyItemRemoved(position);
                     }
@@ -356,8 +396,6 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
 
                     dynamicLinearLayout.addView(linearLayout);
                 }
-
-
             }
         }
     }
