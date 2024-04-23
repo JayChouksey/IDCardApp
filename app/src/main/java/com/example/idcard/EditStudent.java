@@ -176,10 +176,12 @@ public class EditStudent extends AppCompatActivity {
                     @Override
                     public void onResponse(NetworkResponse response) {
                         Toast.makeText(EditStudent.this, "Student updated successfully", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                saveButton.setText("Save");
                 // Display error message from the server
                 if (error.networkResponse != null && error.networkResponse.data != null) {
                     String errorMessage = new String(error.networkResponse.data);
@@ -320,11 +322,13 @@ public class EditStudent extends AppCompatActivity {
                     @Override
                     public void onResponse(NetworkResponse response) {
                         Toast.makeText(EditStudent.this, "Staff updated successfully", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 // Display error message from the server
+                saveButton.setText("Save");
                 if (error.networkResponse != null && error.networkResponse.data != null) {
                     String errorMessage = new String(error.networkResponse.data);
                     Toast.makeText(EditStudent.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
@@ -698,7 +702,7 @@ public class EditStudent extends AppCompatActivity {
         if (!TextUtils.isEmpty(text)) {
             editText.setText(text);
             // Manually add initial text to fieldValueMapStaff
-            fieldValueMapStaff.put(fieldIdentifier, text);
+            fieldValueMap.put(fieldIdentifier, text);
         }
 
         // Add a text change listener to update the HashMap when the text changes

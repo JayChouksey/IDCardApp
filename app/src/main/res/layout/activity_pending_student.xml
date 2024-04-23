@@ -25,18 +25,10 @@
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/app_img"
-                android:layout_width="29dp"
-                android:layout_height="match_parent"
+                android:layout_width="100dp"
+                android:layout_height="30dp"
                 android:layout_marginStart="15dp"
-                android:background="@drawable/logo_img" />
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/app_text"
-                android:layout_width="55dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/logo_text" />
+                android:background="@drawable/app_logo" />
 
 
         </LinearLayout>

@@ -51,6 +51,7 @@ public class PrintedStudent extends AppCompatActivity {
     RecyclerView recyclerView;
     DynamicStudentAdapter adapter;
     Intent intent;
+    Button exportExcel, downloadImages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,8 +85,16 @@ public class PrintedStudent extends AppCompatActivity {
         Button delete = findViewById(R.id.deleteButton);
         Button statusReadyToPrint = findViewById(R.id.moveReadyToPrintdButton);
         Button statusPending = findViewById(R.id.movePendingButton);
-        Button exportExcel = findViewById(R.id.exportExcelButton);
-        Button downloadImages = findViewById(R.id.downloadImagesButton);
+        exportExcel = findViewById(R.id.exportExcelButton);
+        downloadImages = findViewById(R.id.downloadImagesButton);
+
+        // Checking the user is allowed to export images and excel
+        if(getAllowExportImages()){
+            downloadImages.setVisibility(View.VISIBLE);
+        }
+        if(getAllowExportExcel()){
+            exportExcel.setVisibility(View.VISIBLE);
+        }
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -774,6 +783,16 @@ public class PrintedStudent extends AppCompatActivity {
     private String getUserName() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         return sharedPreferences.getString("name", "");
+    }
+
+    private boolean getAllowExportImages(){
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean("allowedImageExport", false);
+    }
+
+    private boolean getAllowExportExcel(){
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean("allowedExcelExport", false);
     }
 
     private void clearSchoolId() {

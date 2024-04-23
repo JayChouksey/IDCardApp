@@ -21,7 +21,7 @@
 
             <ImageView
                 android:id="@+id/avatar_img"
-                android:src="@drawable/add_student_icon"
+                android:src="@drawable/default_icon"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:scaleType="fitCenter"

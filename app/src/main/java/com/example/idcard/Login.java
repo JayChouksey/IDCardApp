@@ -157,6 +157,11 @@ public class Login extends AppCompatActivity {
                                                 JSONObject userObject = jsonResponse.getJSONObject("user");
                                                 // Extract name from user object
                                                 String name = userObject.getString("name");
+                                                boolean exportExcel = userObject.getBoolean("exportExcel");
+                                                boolean exportImages = userObject.optBoolean("exportImage", false);
+                                                int staffLimit = userObject.getInt("staffLimit");
+                                                int studentLimit = userObject.getInt("studentLimit");
+                                                int schoolLimit = userObject.getInt("schoolLimit");
 
                                                 // Save login status
                                                 saveLoginStatus(true);
@@ -164,6 +169,11 @@ public class Login extends AppCompatActivity {
                                                 saveAuthToken(token);
                                                 saveUserName(name);
                                                 saveRole(role);
+                                                saveAllowExportImage(exportImages);
+                                                saveAllowExportExcel(exportExcel);
+                                                saveStaffLimit(staffLimit);
+                                                saveSchoolLimit(schoolLimit);
+                                                saveStudentLimit(studentLimit);
 
                                                 // Start the Profile activity
                                                 Intent intent = new Intent(Login.this, MainActivity.class);
@@ -363,6 +373,41 @@ public class Login extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("_schoolId", id);
+        editor.apply();
+    }
+
+    private void saveAllowExportImage(Boolean bool) {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("allowedImageExport", bool);
+        editor.apply();
+    }
+
+    private void saveAllowExportExcel(Boolean bool) {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("allowedExcelExport", bool);
+        editor.apply();
+    }
+
+    private void saveSchoolLimit(int limit){
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("schoolLimit", limit);
+        editor.apply();
+    }
+
+    private void saveStaffLimit(int limit){
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("staffLimit", limit);
+        editor.apply();
+    }
+
+    private void saveStudentLimit(int limit){
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("studentLimit", limit);
         editor.apply();
     }
 

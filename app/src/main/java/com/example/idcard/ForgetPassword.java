@@ -110,9 +110,4 @@ public class ForgetPassword extends AppCompatActivity {
         queue.add(jsonObjectRequest);
     }
 
-    @Override
-    public void onBackPressed() {
-        // Empty
-    }
-
 }
