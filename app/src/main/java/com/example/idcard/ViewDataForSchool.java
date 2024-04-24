@@ -15,11 +15,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class ViewDataForSchool extends AppCompatActivity {
 
-    String [] status = {"Pending","Ready To Print","Printed"};
+    String [] status = {"Pending","Ready To Print"};
     String [] role = {"Student", "Staff"};
     String strStatus; // To send the status to next activity
     String strRole; // To send role to next activity
-    Intent intentPending, intentReadyToPrint, intentPrinted;
+    Intent intentPending, intentReadyToPrint;
     AutoCompleteTextView autoCompleteSchool, autoCompleteStatus, autoCompleteRole;
     ArrayAdapter<String> adapterSchool, adapterStatus, adapterRole;
     Button submit;
@@ -32,7 +32,6 @@ public class ViewDataForSchool extends AppCompatActivity {
         // Initializing the intent
         intentPending = new Intent(ViewDataForSchool.this, PendingStudent.class);
         intentReadyToPrint = new Intent(ViewDataForSchool.this, ReadyToPrintStudent.class);
-        intentPrinted = new Intent(ViewDataForSchool.this, PrintedStudent.class);
 
         // Setting the school name
         TextView userName = findViewById(R.id.userName);
@@ -55,9 +54,6 @@ public class ViewDataForSchool extends AppCompatActivity {
                         break;
                     case 1:
                         strStatus = "Ready to print";
-                        break;
-                    case 2:
-                        strStatus = "Printed";
                         break;
                 }
             }
@@ -95,12 +91,6 @@ public class ViewDataForSchool extends AppCompatActivity {
                     intentReadyToPrint.putExtra("Status",strStatus);
                     intentReadyToPrint.putExtra("Role",strRole);
                     startActivity(intentReadyToPrint);
-
-                }
-                else{
-                    intentPrinted.putExtra("Status",strStatus);
-                    intentPrinted.putExtra("Role",strRole);
-                    startActivity(intentPrinted);
                 }
             }
         });

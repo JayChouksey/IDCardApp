@@ -43,6 +43,7 @@
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/user_school_icon"
                 android:layout_width="40dp"
                 android:layout_height="45dp"
                 android:layout_gravity="center"
@@ -72,7 +73,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:cardCornerRadius="8dp"
             app:cardElevation="4dp">
 
         <LinearLayout
@@ -96,7 +96,8 @@
                 android:layout_height="wrap_content"
                 android:text="Move To Pending"
                 android:textSize="18sp"
-                android:background="@drawable/button_background"/>
+                android:background="@drawable/button_background"
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/moveReadyToPrintdButton"
@@ -105,7 +106,8 @@
                 android:text="Move To Ready To Print"
                 android:textSize="18sp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/button_background"/>
+                android:background="@drawable/button_background"
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/exportExcelButton"
@@ -114,7 +116,8 @@
                 android:text="Export Records"
                 android:textSize="18sp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/button_background"/>
+                android:background="@drawable/button_background"
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/downloadImagesButton"
@@ -123,7 +126,8 @@
                 android:text="Download Images"
                 android:textSize="18sp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/button_background"/>
+                android:background="@drawable/button_background"
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/deleteButton"
@@ -132,37 +136,17 @@
                 android:text="Delete"
                 android:textSize="18sp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/button_background"/>
+                android:background="@drawable/button_background"
+                android:visibility="gone"/>
 
-            <!-- Select all feature -> will implemented later -->
-               <androidx.cardview.widget.CardView
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:layout_marginTop="10dp"
-               android:backgroundTint="@color/theme">
-
-               <LinearLayout
-                   android:layout_width="match_parent"
-                   android:layout_height="wrap_content"
-                   android:orientation="horizontal">
-
-                   <CheckBox
-                       android:id="@+id/select_all"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"/>
-
-                   <TextView
-                       android:id="@+id/selectText"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:textColor="@color/black"
-                       android:textSize="16sp"
-                       android:textStyle="bold"
-                       android:text="Select All"/>
-
-               </LinearLayout>
-
-           </androidx.cardview.widget.CardView>
+            <TextView
+                android:id="@+id/more_options_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Show Options..."
+                android:background="?android:attr/selectableItemBackground"
+                android:textStyle="bold" />
 
         </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -194,7 +178,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    app:cardCornerRadius="8dp"
                     app:cardElevation="4dp">
 
                     <LinearLayout
@@ -205,10 +188,112 @@
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp">
 
+                        <!-- Select all feature -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@color/theme">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:orientation="horizontal">
+
+                                <CheckBox
+                                    android:id="@+id/select_all"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"/>
+
+                                <TextView
+                                    android:id="@+id/selectText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/black"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    android:text="Select All"/>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="end"
+                                    android:orientation="vertical">
+
+                                    <ImageView
+                                        android:id="@+id/filter_img"
+                                        android:layout_width="22dp"
+                                        android:layout_height="20dp"
+                                        android:src="@drawable/filter_icon"
+                                        android:layout_marginEnd="10dp"/>
+
+                                    <TextView
+                                        android:id="@+id/filter_text"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/black"
+                                        android:textStyle="bold"
+                                        android:textSize="10sp"
+                                        android:layout_marginEnd="10dp"
+                                        android:text="Filter"/>
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- Search Bar -->
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cardview_search"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="4dp"
+                            android:visibility="gone">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/search_bg">
+
+                                <EditText
+                                    android:id="@+id/search_edit_text"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:layout_toStartOf="@+id/search_button"
+                                    android:background="@android:color/transparent"
+                                    android:hint="Enter Filter"
+                                    android:padding="8dp"
+                                    android:textColor="@android:color/black"
+                                    android:textColorHint="#808080"
+                                    android:textSize="16sp" />
+
+                                <ImageButton
+                                    android:id="@+id/search_button"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_centerVertical="true"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:padding="8dp"
+                                    android:src="@drawable/search"/>
+
+                            </RelativeLayout>
+
+                        </androidx.cardview.widget.CardView>
+                        <!-- End of Search -->
+
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/student_list_recycle"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"/>
 
                     </LinearLayout>
 

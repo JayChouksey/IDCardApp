@@ -140,6 +140,8 @@ public class SchoolInfoAdapter extends RecyclerView.Adapter<SchoolInfoAdapter.Vi
                         intent.putExtra("contactSchool",textSchoolMobileValue.getText().toString().trim());
                         intent.putExtra("emailSchool",textEmailValue.getText().toString().trim());
                         intent.putExtra("addressSchool",textSchoolAddressValue.getText().toString().trim());
+                        intent.putExtra("reqFieldsStudents",textAllowedFieldsValue.getText().toString().trim());
+                        intent.putExtra("reqFieldsStaffs",textAllowedFieldsValueStaff.getText().toString().trim());
                         itemView.getContext().startActivity(intent);
                     }
                 }

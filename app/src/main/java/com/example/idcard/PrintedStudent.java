@@ -2,6 +2,7 @@ package com.example.idcard;
 
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -12,11 +13,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -51,13 +56,72 @@ public class PrintedStudent extends AppCompatActivity {
     RecyclerView recyclerView;
     DynamicStudentAdapter adapter;
     Intent intent;
-    Button exportExcel, downloadImages;
+    Button exportExcel, downloadImages, delete, statusReadyToPrint, statusPending;
+    Boolean isMoreOptions = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_printed_student);
 
+        // Filter Functionality
+        ImageView filter = findViewById(R.id.filter_img);
+        CardView cardViewSearch = findViewById(R.id.cardview_search);
+        EditText editTextSearch = findViewById(R.id.search_edit_text);
+        filter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Options dialog to choose between picking from gallery or capturing from camera
+                CharSequence[] options = {"Class", "Roll No.", "Remove Filter"};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(PrintedStudent.this);
+                builder.setTitle("Choose Filter");
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+                        if (item == 0) {
+                            cardViewSearch.setVisibility(View.VISIBLE);
+                            editTextSearch.setHint("Enter Class");
+                        } else if (item == 1) {
+                            cardViewSearch.setVisibility(View.VISIBLE);
+                            editTextSearch.setHint("Enter Roll No.");
+                        }else if(item == 2){
+                            cardViewSearch.setVisibility(View.GONE);
+                        }
+                    }
+                });
+                builder.show();
+            }
+        });
+
+        TextView filterText = findViewById(R.id.filter_text);
+        filterText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Options dialog to choose between picking from gallery or capturing from camera
+                CharSequence[] options = {"Class", "Roll No.", "Remove Filter"};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(PrintedStudent.this);
+                builder.setTitle("Choose Filter");
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+                        if (item == 0) {
+                            cardViewSearch.setVisibility(View.VISIBLE);
+                            editTextSearch.setHint("Enter Class");
+                        } else if (item == 1) {
+                            cardViewSearch.setVisibility(View.VISIBLE);
+                            editTextSearch.setHint("Enter Roll No.");
+                        }else if(item == 2){
+                            cardViewSearch.setVisibility(View.GONE);
+                        }
+                    }
+                });
+                builder.show();
+            }
+        });
+
+        // Fetching data Role wise
         intent = getIntent();
 
         String role = intent.getStringExtra("Role");
@@ -65,12 +129,19 @@ public class PrintedStudent extends AppCompatActivity {
             fetchStudentData();
         }
         else if(role.equals("Staff")){
+            filter.setVisibility(View.GONE);
+            filterText.setVisibility(View.GONE);
             fetchStaffData();
         }
 
         // Setting user text name to user
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
+
+        ImageView topIcon = findViewById(R.id.user_school_icon);
+        if(getRole().equals("school")){
+            topIcon.setImageResource(R.drawable.school_home_icon);
+        }
 
         // Select all feature
         CheckBox selectAllCheckbox = findViewById(R.id.select_all);
@@ -82,19 +153,47 @@ public class PrintedStudent extends AppCompatActivity {
         });
 
 
-        Button delete = findViewById(R.id.deleteButton);
-        Button statusReadyToPrint = findViewById(R.id.moveReadyToPrintdButton);
-        Button statusPending = findViewById(R.id.movePendingButton);
+        delete = findViewById(R.id.deleteButton);
+        statusReadyToPrint = findViewById(R.id.moveReadyToPrintdButton);
+        statusPending = findViewById(R.id.movePendingButton);
         exportExcel = findViewById(R.id.exportExcelButton);
         downloadImages = findViewById(R.id.downloadImagesButton);
 
-        // Checking the user is allowed to export images and excel
-        if(getAllowExportImages()){
-            downloadImages.setVisibility(View.VISIBLE);
-        }
-        if(getAllowExportExcel()){
-            exportExcel.setVisibility(View.VISIBLE);
-        }
+        // More options text functionality
+        TextView moreOptions = findViewById(R.id.more_options_text);
+        moreOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isMoreOptions){
+                    delete.setVisibility(View.VISIBLE);
+                    statusReadyToPrint.setVisibility(View.VISIBLE);
+                    statusPending.setVisibility(View.VISIBLE);
+
+                    // Checking the user is allowed to export images and excel
+                    if(getAllowExportImages()){
+                        downloadImages.setVisibility(View.VISIBLE);
+                    }
+                    if(getAllowExportExcel()){
+                        exportExcel.setVisibility(View.VISIBLE);
+                    }
+
+                    moreOptions.setText("Hide Options...");
+                    isMoreOptions = false;
+                }
+                else{
+                    delete.setVisibility(View.GONE);
+                    statusReadyToPrint.setVisibility(View.GONE);
+                    statusPending.setVisibility(View.GONE);
+                    exportExcel.setVisibility(View.GONE);
+                    downloadImages.setVisibility(View.GONE);
+                    moreOptions.setText("Show Options...");
+                    isMoreOptions = true;
+                }
+
+            }
+        });
+
+        // Button Click Functions
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,7 +233,6 @@ public class PrintedStudent extends AppCompatActivity {
                 finish();
             }
         });
-
         exportExcel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -373,11 +471,19 @@ public class PrintedStudent extends AppCompatActivity {
 
     public void downloadImages(Context context) {
         String schoolId = getId();
+        String status = "Printed";
 
-        String url = "https://id-card-backend-2.onrender.com/user/student/images/" + schoolId + "/?status=Printed";
+        String url = "https://id-card-backend-2.onrender.com/user/student/images/" + schoolId;
         RequestQueue queue = Volley.newRequestQueue(context);
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, null,
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("status", status);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, requestBody,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -418,18 +524,26 @@ public class PrintedStudent extends AppCompatActivity {
 
     public void downloadImagesStaff(Context context) {
         String schoolId = getId();
+        String status = "Printed";
 
-        String url = "https://id-card-backend-2.onrender.com/user/staff/images/" + schoolId + "/?status=Panding";
+        String url = "https://id-card-backend-2.onrender.com/user/staff/images/" + schoolId;
         RequestQueue queue = Volley.newRequestQueue(context);
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, null,
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("status", status);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, requestBody,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            JSONArray studentImages = response.getJSONArray("staffImages");
-                            for (int i = 0; i < studentImages.length(); i++) {
-                                String imageUrl = studentImages.getString(i);
+                            JSONArray staffImages = response.getJSONArray("staffImages");
+                            for (int i = 0; i < staffImages.length(); i++) {
+                                String imageUrl = staffImages.getString(i);
                                 String folderName = "Printed Staff Images";
                                 ImageDownloader.downloadImage(context, imageUrl, folderName);
                             }
@@ -460,6 +574,7 @@ public class PrintedStudent extends AppCompatActivity {
 
         queue.add(jsonObjectRequest);
     }
+
     // End of Download image and excel
 
     // Method to update school list recycler view
@@ -783,6 +898,11 @@ public class PrintedStudent extends AppCompatActivity {
     private String getUserName() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         return sharedPreferences.getString("name", "");
+    }
+
+    private String getRole() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("role", "");
     }
 
     private boolean getAllowExportImages(){

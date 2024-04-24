@@ -253,6 +253,18 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
                         .into(avatar);
             }
 
+            // Check if status is "Printed"
+            String status = student.getValue("status");
+            if (status != null && status.equals("Printed")) {
+                // Hide Edit and Delete buttons
+                btnEdit.setVisibility(View.GONE);
+                btnDelete.setVisibility(View.GONE);
+            } else {
+                // Show Edit and Delete buttons
+                btnEdit.setVisibility(View.VISIBLE);
+                btnDelete.setVisibility(View.VISIBLE);
+            }
+
             // Loop through all fields and add TextViews dynamically
             for (Map.Entry<String, String> entry : student.getFields().entrySet()) {
 

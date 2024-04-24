@@ -152,6 +152,7 @@
 
                         <!-- Password -->
                         <TextView
+                            android:id="@+id/textFieldPassword"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="20dp"
@@ -170,6 +171,7 @@
 
                         <!-- Confirm Password -->
                         <TextView
+                            android:id="@+id/textFieldConfirmPassword"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="20dp"
@@ -206,7 +208,7 @@
 
                         <!-- ID card student data which will be shown in the card -->
                         <LinearLayout
-                            android:id="@+id/LinearLayoutIdCardData"
+                            android:id="@+id/LinearLayoutStudentData"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">

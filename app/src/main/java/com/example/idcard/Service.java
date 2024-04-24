@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -30,6 +31,11 @@ public class Service extends AppCompatActivity {
 
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
+
+        ImageView topIcon = findViewById(R.id.user_school_icon);
+        if(getRole().equals("school")){
+            topIcon.setImageResource(R.drawable.school_home_icon);
+        }
 
         editTextHelp = findViewById(R.id.editTextHelp);
         editTextName = findViewById(R.id.editTextName);
@@ -64,6 +70,11 @@ public class Service extends AppCompatActivity {
     private String getUserName() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         return sharedPreferences.getString("name", "");
+    }
+
+    private String getRole() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("role", "");
     }
     // End of method to get the token saved in local storage
 

@@ -3,6 +3,7 @@ package com.example.idcard;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -24,6 +25,11 @@ public class Contact extends AppCompatActivity {
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
 
+        ImageView topIcon = findViewById(R.id.user_school_icon);
+        if(getRole().equals("school")){
+            topIcon.setImageResource(R.drawable.school_home_icon);
+        }
+
 
         // Initialize animation view
         animationView = findViewById(R.id.lottieAnimationView);
@@ -41,6 +47,11 @@ public class Contact extends AppCompatActivity {
     private String getUserName() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         return sharedPreferences.getString("name", "");
+    }
+
+    private String getRole() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("role", "");
     }
     // End of method to get the token saved in local storage
 
