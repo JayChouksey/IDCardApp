@@ -253,6 +253,10 @@ public class Login extends AppCompatActivity {
                                                 JSONObject userObject = jsonResponse.getJSONObject("school");
                                                 // Extract name from user object
                                                 String name = userObject.getString("name");
+                                                // Modifying the name if it is too long
+                                                if(name.length() >= 16){
+                                                    name = name.substring(0,16) + "...";
+                                                }
                                                 String schoolId = userObject.getString("_id");
 
                                                 // Save login status

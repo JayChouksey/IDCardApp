@@ -32,10 +32,18 @@ public class Service extends AppCompatActivity {
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
 
-        ImageView topIcon = findViewById(R.id.user_school_icon);
+        ImageView topIcon = findViewById(R.id.user_distributor_icon);
         if(getRole().equals("school")){
             topIcon.setImageResource(R.drawable.school_home_icon);
         }
+        ImageView appLogo = findViewById(R.id.app_img);
+        appLogo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getBaseContext(), About.class);
+                startActivity(intent);
+            }
+        });
 
         editTextHelp = findViewById(R.id.editTextHelp);
         editTextName = findViewById(R.id.editTextName);
@@ -49,12 +57,12 @@ public class Service extends AppCompatActivity {
                 String name = editTextName.getText().toString().trim();
                 String contact = editTextContact.getText().toString().trim();
 
-                String message = "Name: " + name + "\n\nContact: " + contact + "\n\nNeeded help: " + helpMessage;
+                String message = "*Name:* " + name + "\n\n*Contact:* " + contact + "\n\n*Needed help:* " + helpMessage;
 
                 if (!helpMessage.isEmpty()) {
                     // Send message to WhatsApp
                     Intent whatsappIntent = new Intent(Intent.ACTION_VIEW);
-                    whatsappIntent.setData(Uri.parse("https://api.whatsapp.com/send?phone=+918770994162&text=" + message));
+                    whatsappIntent.setData(Uri.parse("https://api.whatsapp.com/send?phone=+918881888256&text=" + message));
                     startActivity(whatsappIntent);
                 }
             }

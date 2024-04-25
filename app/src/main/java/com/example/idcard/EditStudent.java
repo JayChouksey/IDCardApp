@@ -60,6 +60,11 @@ public class EditStudent extends AppCompatActivity {
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
 
+        ImageView topIcon = findViewById(R.id.user_distributor_icon);
+        if(getRole().equals("school")){
+            topIcon.setImageResource(R.drawable.school_home_icon);
+        }
+
         // components initialization
         saveButton = findViewById(R.id.saveButton);
         resetButton = findViewById(R.id.resetButton);

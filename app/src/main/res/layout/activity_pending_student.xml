@@ -43,9 +43,9 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/user_school_icon"
-                android:layout_width="40dp"
-                android:layout_height="45dp"
+                android:id="@+id/user_distributor_icon"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_gravity="center"
                 android:src="@drawable/icon_distributor"/>
 
@@ -54,6 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:textStyle="bold"
                 android:text="Distributor's Name"/>
 
         </LinearLayout>
@@ -82,15 +83,16 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- School List Heading -->
-<!--                <TextView
-                    android:id="@+id/text"
+                <!-- Pending Data Heading -->
+                <TextView
+                    android:id="@+id/text_heading"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="List Student"
+                    android:text="Pending"
+                    android:layout_marginBottom="10dp"
                     android:textSize="24sp"
-                    android:textStyle="bold" />-->
+                    android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/moveReadyToPrintButton"
@@ -145,10 +147,12 @@
                     android:id="@+id/more_options_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Show Options..."
+                    android:layout_gravity="center"
+                    android:textSize="12sp"
+                    android:textColor="#9C27B0"
                     android:background="?android:attr/selectableItemBackground"
-                    android:textStyle="bold"
-                    android:layout_gravity="center"/>
+                    android:text="Show Options..."
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
@@ -191,6 +195,7 @@
 
                         <!-- Select all feature -->
                         <androidx.cardview.widget.CardView
+                            android:id="@+id/cardview_select_all"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:backgroundTint="@color/theme">
@@ -250,6 +255,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginEnd="5dp"
                             app:cardCornerRadius="20dp"
                             app:cardElevation="4dp"
                             android:visibility="gone">
@@ -289,6 +296,16 @@
 
                         </androidx.cardview.widget.CardView>
                         <!-- End of Search -->
+
+                        <ImageView
+                            android:id="@+id/img_no_data_found"
+                            android:layout_width="wrap_content"
+                            android:layout_height="350dp"
+                            android:layout_marginTop="60dp"
+                            android:layout_marginBottom="150dp"
+                            android:layout_gravity="center"
+                            android:visibility="gone"
+                            android:src="@drawable/no_data_found_icon"/>
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/student_list_recycle"

@@ -67,6 +67,15 @@ public class AddDataForSchool extends AppCompatActivity {
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
 
+        ImageView appLogo = findViewById(R.id.app_img);
+        appLogo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getBaseContext(), About.class);
+                startActivity(intent);
+            }
+        });
+
         // Role Dropdown
         autoCompleteRole = findViewById(R.id.role_dropdown);
         adapterRole = new ArrayAdapter<String>(this,R.layout.list_item,role);

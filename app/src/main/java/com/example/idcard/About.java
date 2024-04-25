@@ -1,8 +1,11 @@
 package com.example.idcard;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -24,6 +27,15 @@ public class About extends AppCompatActivity {
 
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
+
+        ImageView appLogo = findViewById(R.id.app_img);
+        appLogo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getBaseContext(), About.class);
+                startActivity(intent);
+            }
+        });
 
         // Initialize animation view
         animationView = findViewById(R.id.lottieAnimationView);

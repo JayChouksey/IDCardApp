@@ -54,21 +54,30 @@ public class ReadyToPrintStudent extends AppCompatActivity {
     Intent intent;
     Button exportExcel, downloadImages, delete, statusPrinted, statusPending;
     Boolean isMoreOptions = true;
+    ImageView imageViewNoDataFound;
+    CardView cardViewSelectAll;
+    TextView moreOptions, heading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ready_to_print_student);
 
+        // Initialization
+        imageViewNoDataFound = findViewById(R.id.img_no_data_found);
+        cardViewSelectAll = findViewById(R.id.cardview_select_all);
+        heading = findViewById(R.id.text_heading);
+
         // Filter Functionality
         ImageView filter = findViewById(R.id.filter_img);
         CardView cardViewSearch = findViewById(R.id.cardview_search);
         EditText editTextSearch = findViewById(R.id.search_edit_text);
+        ImageView searchButton = findViewById(R.id.search_button);
         filter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Options dialog to choose between picking from gallery or capturing from camera
-                CharSequence[] options = {"Class", "Roll No.", "Remove Filter"};
+                CharSequence[] options = {"Class", "Section", "Remove Filter"};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(ReadyToPrintStudent.this);
                 builder.setTitle("Choose Filter");
@@ -77,12 +86,36 @@ public class ReadyToPrintStudent extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int item) {
                         if (item == 0) {
                             cardViewSearch.setVisibility(View.VISIBLE);
+                            imageViewNoDataFound.setVisibility(View.GONE);
+                            editTextSearch.setText("");
                             editTextSearch.setHint("Enter Class");
+                            searchButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    imageViewNoDataFound.setVisibility(View.GONE);
+                                    String keyword = editTextSearch.getText().toString().trim();
+                                    fetchStudentDataClassFilter(keyword);
+                                }
+                            });
                         } else if (item == 1) {
                             cardViewSearch.setVisibility(View.VISIBLE);
-                            editTextSearch.setHint("Enter Roll No.");
+                            imageViewNoDataFound.setVisibility(View.GONE);
+                            editTextSearch.setText("");
+                            editTextSearch.setHint("Enter Section");
+                            searchButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    imageViewNoDataFound.setVisibility(View.GONE);
+                                    String keyword = editTextSearch.getText().toString().trim();
+                                    fetchStudentDataSectionFilter(keyword);
+                                }
+                            });
                         }else if(item == 2){
                             cardViewSearch.setVisibility(View.GONE);
+                            imageViewNoDataFound.setVisibility(View.GONE);
+                            moreOptions.setVisibility(View.VISIBLE);
+                            editTextSearch.setText("");
+                            fetchStudentData();
                         }
                     }
                 });
@@ -95,7 +128,7 @@ public class ReadyToPrintStudent extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Options dialog to choose between picking from gallery or capturing from camera
-                CharSequence[] options = {"Class", "Roll No.", "Remove Filter"};
+                CharSequence[] options = {"Class", "Section", "Remove Filter"};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(ReadyToPrintStudent.this);
                 builder.setTitle("Choose Filter");
@@ -104,12 +137,36 @@ public class ReadyToPrintStudent extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int item) {
                         if (item == 0) {
                             cardViewSearch.setVisibility(View.VISIBLE);
+                            imageViewNoDataFound.setVisibility(View.GONE);
+                            editTextSearch.setText("");
                             editTextSearch.setHint("Enter Class");
+                            searchButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    imageViewNoDataFound.setVisibility(View.GONE);
+                                    String keyword = editTextSearch.getText().toString().trim();
+                                    fetchStudentDataClassFilter(keyword);
+                                }
+                            });
                         } else if (item == 1) {
                             cardViewSearch.setVisibility(View.VISIBLE);
-                            editTextSearch.setHint("Enter Roll No.");
+                            imageViewNoDataFound.setVisibility(View.GONE);
+                            editTextSearch.setText("");
+                            editTextSearch.setHint("Enter Section");
+                            searchButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    imageViewNoDataFound.setVisibility(View.GONE);
+                                    String keyword = editTextSearch.getText().toString().trim();
+                                    fetchStudentDataSectionFilter(keyword);
+                                }
+                            });
                         }else if(item == 2){
                             cardViewSearch.setVisibility(View.GONE);
+                            imageViewNoDataFound.setVisibility(View.GONE);
+                            moreOptions.setVisibility(View.VISIBLE);
+                            editTextSearch.setText("");
+                            fetchStudentData();
                         }
                     }
                 });
@@ -122,22 +179,32 @@ public class ReadyToPrintStudent extends AppCompatActivity {
 
         String role = intent.getStringExtra("Role");
         if(role.equals("Student")){
+            heading.setText("Ready to Print Student Data");
             fetchStudentData();
         }
         else if(role.equals("Staff")){
-            fetchStaffData();
+            heading.setText("Ready to Print Staff Data");
             filter.setVisibility(View.GONE);
             filterText.setVisibility(View.GONE);
+            fetchStaffData();
         }
 
         // Setting user text name to user
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
 
-        ImageView topIcon = findViewById(R.id.user_school_icon);
+        ImageView topIcon = findViewById(R.id.user_distributor_icon);
         if(getRole().equals("school")){
             topIcon.setImageResource(R.drawable.school_home_icon);
         }
+        ImageView appLogo = findViewById(R.id.app_img);
+        appLogo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getBaseContext(), About.class);
+                startActivity(intent);
+            }
+        });
 
         // Select all feature
         CheckBox selectAllCheckbox = findViewById(R.id.select_all);
@@ -156,7 +223,7 @@ public class ReadyToPrintStudent extends AppCompatActivity {
         downloadImages = findViewById(R.id.downloadImagesButton);
 
         // More options text functionality
-        TextView moreOptions = findViewById(R.id.more_options_text);
+        moreOptions = findViewById(R.id.more_options_text);
         moreOptions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -313,9 +380,188 @@ public class ReadyToPrintStudent extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 if (error.networkResponse != null && error.networkResponse.data != null) {
                     String errorMessage = new String(error.networkResponse.data);
-                    Toast.makeText(ReadyToPrintStudent.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    if (errorMessage.contains("No students found for the provided school ID")) {
+                        imageViewNoDataFound.setVisibility(View.VISIBLE);
+                        cardViewSelectAll.setVisibility(View.GONE);
+                        moreOptions.setVisibility(View.GONE);
+                    } else {
+                        Toast.makeText(ReadyToPrintStudent.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    Toast.makeText(ReadyToPrintStudent.this, "Error adding student", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ReadyToPrintStudent.this, "Error showing student data", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> header = new HashMap<>();
+                header.put("Authorization", token);
+                return header;
+            }
+        };
+
+        // Add the request to the RequestQueue
+        queue.add(jsonObjectRequest);
+    }
+
+    private void fetchStudentDataClassFilter(String filter) {
+        // Get the authorization token
+        String token = getToken();
+        String id = getId(); // From local storage
+        String status = intent.getStringExtra("Status");
+
+        String url = "https://id-card-backend-2.onrender.com/user/students/" + id + "?status=" + status;
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        // Create a JSONObject to hold the request body data
+        JSONObject requestBody = new JSONObject();
+        try {
+            // Add the "class" parameter to the request body
+            requestBody.put("class", filter);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, requestBody,
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Toast.makeText(ReadyToPrintStudent.this, "Data Fetched Successfully", Toast.LENGTH_SHORT).show();
+                        List<DynamicStudent> studentList = new ArrayList<>();
+                        try {
+                            JSONArray studentsArray = response.getJSONArray("students");
+                            for (int i = 0; i < studentsArray.length(); i++) {
+                                JSONObject studentObject = studentsArray.getJSONObject(i);
+                                DynamicStudent student = new DynamicStudent();
+
+                                // Iterate over the keys of the JSON object
+                                Iterator<String> keys = studentObject.keys();
+                                while (keys.hasNext()) {
+                                    String key = keys.next();
+                                    if (key.equals("avatar") || key.equals("__v") || key.equals("createdAt") ||
+                                            key.equals("updatedAt") || key.equals("user") || key.equals("photoName")) {
+                                        continue; // Skip this key
+                                    }
+                                    String value = studentObject.getString(key);
+                                    student.addField(key, value);
+                                }
+                                // Handling the avatar key separately to extract the URL
+                                JSONObject avatarObject = studentObject.optJSONObject("avatar");
+                                if (avatarObject != null) {
+                                    String avatarUrl = avatarObject.optString("url");
+                                    student.setAvatarUrl(avatarUrl);
+                                }
+                                studentList.add(student);
+                            }
+                            // Updating recycler view for data fetching
+                            updateRecyclerView(studentList);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    String errorMessage = new String(error.networkResponse.data);
+                    if (errorMessage.contains("No students found for the provided school ID")) {
+                        imageViewNoDataFound.setVisibility(View.VISIBLE);
+                        //cardViewSelectAll.setVisibility(View.GONE);
+                        moreOptions.setVisibility(View.GONE);
+                    } else {
+                        Toast.makeText(ReadyToPrintStudent.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(ReadyToPrintStudent.this, "Error showing student data", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> header = new HashMap<>();
+                header.put("Authorization", token);
+                return header;
+            }
+        };
+
+        // Add the request to the RequestQueue
+        queue.add(jsonObjectRequest);
+    }
+    private void fetchStudentDataSectionFilter(String filter) {
+        // Get the authorization token
+        String token = getToken();
+        String id = getId(); // From local storage
+        String status = intent.getStringExtra("Status");
+
+        String url = "https://id-card-backend-2.onrender.com/user/students/" + id + "?status=" + status;
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        // Create a JSONObject to hold the request body data
+        JSONObject requestBody = new JSONObject();
+        try {
+            // Add the "class" parameter to the request body
+            requestBody.put("section", filter);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, requestBody,
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Toast.makeText(ReadyToPrintStudent.this, "Data Fetched Successfully", Toast.LENGTH_SHORT).show();
+                        List<DynamicStudent> studentList = new ArrayList<>();
+                        try {
+                            JSONArray studentsArray = response.getJSONArray("students");
+                            for (int i = 0; i < studentsArray.length(); i++) {
+                                JSONObject studentObject = studentsArray.getJSONObject(i);
+                                DynamicStudent student = new DynamicStudent();
+
+                                // Iterate over the keys of the JSON object
+                                Iterator<String> keys = studentObject.keys();
+                                while (keys.hasNext()) {
+                                    String key = keys.next();
+                                    if (key.equals("avatar") || key.equals("__v") || key.equals("createdAt") ||
+                                            key.equals("updatedAt") || key.equals("user") || key.equals("photoName")) {
+                                        continue; // Skip this key
+                                    }
+                                    String value = studentObject.getString(key);
+                                    student.addField(key, value);
+                                }
+                                // Handling the avatar key separately to extract the URL
+                                JSONObject avatarObject = studentObject.optJSONObject("avatar");
+                                if (avatarObject != null) {
+                                    String avatarUrl = avatarObject.optString("url");
+                                    student.setAvatarUrl(avatarUrl);
+                                }
+                                studentList.add(student);
+                            }
+                            // Updating recycler view for data fetching
+                            updateRecyclerView(studentList);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    String errorMessage = new String(error.networkResponse.data);
+                    if (errorMessage.contains("No students found for the provided school ID")) {
+                        imageViewNoDataFound.setVisibility(View.VISIBLE);
+                        //cardViewSelectAll.setVisibility(View.GONE);
+                        moreOptions.setVisibility(View.GONE);
+                    } else {
+                        Toast.makeText(ReadyToPrintStudent.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(ReadyToPrintStudent.this, "Error showing student data", Toast.LENGTH_SHORT).show();
                 }
             }
         }) {
@@ -386,9 +632,15 @@ public class ReadyToPrintStudent extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 if (error.networkResponse != null && error.networkResponse.data != null) {
                     String errorMessage = new String(error.networkResponse.data);
-                    Toast.makeText(ReadyToPrintStudent.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    if (errorMessage.contains("No staff found for the provided school ID")) {
+                        imageViewNoDataFound.setVisibility(View.VISIBLE);
+                        cardViewSelectAll.setVisibility(View.GONE);
+                        moreOptions.setVisibility(View.GONE);
+                    } else {
+                        Toast.makeText(ReadyToPrintStudent.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    Toast.makeText(ReadyToPrintStudent.this, "Error adding student", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ReadyToPrintStudent.this, "Error showing staff data", Toast.LENGTH_SHORT).show();
                 }
             }
         }) {

@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -105,6 +106,15 @@ public class ImportStudents extends AppCompatActivity {
         // Setting the distributor name
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
+
+        ImageView appLogo = findViewById(R.id.app_img);
+        appLogo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getBaseContext(), About.class);
+                startActivity(intent);
+            }
+        });
 
         selectedImageUris = new ArrayList<>();
         selectedImagesBitmap = new ArrayList<>();

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +26,15 @@ public class SchoolHome extends AppCompatActivity {
         // Setting the school name
         TextView userName = findViewById(R.id.userName);
         userName.setText(getUserName());
+
+        ImageView appLogo = findViewById(R.id.app_img);
+        appLogo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getBaseContext(), About.class);
+                startActivity(intent);
+            }
+        });
 
         cardViewAddData = findViewById(R.id.cardViewAddData);
         cardViewViewData = findViewById(R.id.cardViewViewData);
