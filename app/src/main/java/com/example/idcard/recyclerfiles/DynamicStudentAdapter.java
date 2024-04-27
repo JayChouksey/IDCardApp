@@ -243,8 +243,8 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
             String avatarUrl = student.getAvatarUrl();
             if (avatarUrl != null && !avatarUrl.isEmpty()) {
                 RequestOptions requestOptions = new RequestOptions()
-                        .placeholder(R.drawable.school_list_student) // Placeholder image while loading
-                        .error(R.drawable.about_icon); // Error image if loading fails
+                        .placeholder(R.drawable.default_icon) // Placeholder image while loading
+                        .error(R.drawable.default_icon); // Error image if loading fails
 
                 Glide.with(itemView.getContext())
                         .load(avatarUrl)
@@ -256,6 +256,10 @@ public class DynamicStudentAdapter extends RecyclerView.Adapter<DynamicStudentAd
             // Check if status is "Printed"
             String status = student.getValue("status");
             if (status != null && status.equals("Printed")) {
+                // Hide Edit and Delete buttons
+                btnEdit.setVisibility(View.GONE);
+                btnDelete.setVisibility(View.GONE);
+            }else if (status != null && status.equals("Ready to print")) {
                 // Hide Edit and Delete buttons
                 btnEdit.setVisibility(View.GONE);
                 btnDelete.setVisibility(View.GONE);

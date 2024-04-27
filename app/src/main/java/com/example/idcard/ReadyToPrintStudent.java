@@ -53,7 +53,7 @@ public class ReadyToPrintStudent extends AppCompatActivity {
     DynamicStudentAdapter adapter;
     Intent intent;
     Button exportExcel, downloadImages, delete, statusPrinted, statusPending;
-    Boolean isMoreOptions = true;
+    Boolean isMoreOptions = true, isSchool = false;
     ImageView imageViewNoDataFound;
     CardView cardViewSelectAll;
     TextView moreOptions, heading;
@@ -64,6 +64,7 @@ public class ReadyToPrintStudent extends AppCompatActivity {
         setContentView(R.layout.activity_ready_to_print_student);
 
         // Initialization
+        recyclerView = findViewById(R.id.student_list_recycle);
         imageViewNoDataFound = findViewById(R.id.img_no_data_found);
         cardViewSelectAll = findViewById(R.id.cardview_select_all);
         heading = findViewById(R.id.text_heading);
@@ -195,6 +196,7 @@ public class ReadyToPrintStudent extends AppCompatActivity {
 
         ImageView topIcon = findViewById(R.id.user_distributor_icon);
         if(getRole().equals("school")){
+            isSchool = true; // school can't see "Move to Printed" button here
             topIcon.setImageResource(R.drawable.school_home_icon);
         }
         ImageView appLogo = findViewById(R.id.app_img);
@@ -228,10 +230,15 @@ public class ReadyToPrintStudent extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(isMoreOptions){
-                    delete.setVisibility(View.VISIBLE);
-                    statusPrinted.setVisibility(View.VISIBLE);
-                    statusPending.setVisibility(View.VISIBLE);
-
+                    if(isSchool){
+                        delete.setVisibility(View.VISIBLE);
+                        statusPending.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        delete.setVisibility(View.VISIBLE);
+                        statusPrinted.setVisibility(View.VISIBLE);
+                        statusPending.setVisibility(View.VISIBLE);
+                    }
                     // Checking the user is allowed to export images and excel
                     if(getAllowExportImages()){
                         downloadImages.setVisibility(View.VISIBLE);
@@ -341,9 +348,28 @@ public class ReadyToPrintStudent extends AppCompatActivity {
 
                     @Override
                     public void onResponse(JSONObject response) {
+                        // if there is no data then set an image to show that
+                        boolean success = false;
+                        try {
+                            success = response.getBoolean("success");
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        try {
+                            if (!success && response.has("message") && response.getString("message").contains("No students found for the provided school ID")) {
+                                imageViewNoDataFound.setVisibility(View.VISIBLE);
+                                cardViewSelectAll.setVisibility(View.GONE);
+                                moreOptions.setVisibility(View.GONE);
+                                return; // Exit the method as no further processing is needed
+                            }
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        // else show the data
                         Toast.makeText(ReadyToPrintStudent.this, "Data Fetched Successfully", Toast.LENGTH_SHORT).show();
                         List<DynamicStudent> studentList = new ArrayList<>();
                         try {
+                            recyclerView.setVisibility(View.VISIBLE);
                             JSONArray studentsArray = response.getJSONArray("students");
                             for (int i = 0; i < studentsArray.length(); i++) {
                                 JSONObject studentObject = studentsArray.getJSONObject(i);
@@ -418,7 +444,7 @@ public class ReadyToPrintStudent extends AppCompatActivity {
         JSONObject requestBody = new JSONObject();
         try {
             // Add the "class" parameter to the request body
-            requestBody.put("class", filter);
+            requestBody.put("studentClass", filter);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -428,9 +454,29 @@ public class ReadyToPrintStudent extends AppCompatActivity {
 
                     @Override
                     public void onResponse(JSONObject response) {
+                        // if there is no data then set an image to show that
+                        boolean success = false;
+                        try {
+                            success = response.getBoolean("success");
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        try {
+                            if (!success && response.has("message") && response.getString("message").contains("No students found for the provided school ID")) {
+                                imageViewNoDataFound.setVisibility(View.VISIBLE);
+                                recyclerView.setVisibility(View.GONE);
+                                //cardViewSelectAll.setVisibility(View.GONE);
+                                //moreOptions.setVisibility(View.GONE);
+                                return; // Exit the method as no further processing is needed
+                            }
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        // else show the data
                         Toast.makeText(ReadyToPrintStudent.this, "Data Fetched Successfully", Toast.LENGTH_SHORT).show();
                         List<DynamicStudent> studentList = new ArrayList<>();
                         try {
+                            recyclerView.setVisibility(View.VISIBLE);
                             JSONArray studentsArray = response.getJSONArray("students");
                             for (int i = 0; i < studentsArray.length(); i++) {
                                 JSONObject studentObject = studentsArray.getJSONObject(i);
@@ -514,9 +560,29 @@ public class ReadyToPrintStudent extends AppCompatActivity {
 
                     @Override
                     public void onResponse(JSONObject response) {
+                        // if there is no data then set an image to show that
+                        boolean success = false;
+                        try {
+                            success = response.getBoolean("success");
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        try {
+                            if (!success && response.has("message") && response.getString("message").contains("No students found for the provided school ID")) {
+                                imageViewNoDataFound.setVisibility(View.VISIBLE);
+                                recyclerView.setVisibility(View.GONE);
+                                //cardViewSelectAll.setVisibility(View.GONE);
+                                //moreOptions.setVisibility(View.GONE);
+                                return; // Exit the method as no further processing is needed
+                            }
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        // else show the data
                         Toast.makeText(ReadyToPrintStudent.this, "Data Fetched Successfully", Toast.LENGTH_SHORT).show();
                         List<DynamicStudent> studentList = new ArrayList<>();
                         try {
+                            recyclerView.setVisibility(View.VISIBLE);
                             JSONArray studentsArray = response.getJSONArray("students");
                             for (int i = 0; i < studentsArray.length(); i++) {
                                 JSONObject studentObject = studentsArray.getJSONObject(i);
@@ -592,6 +658,24 @@ public class ReadyToPrintStudent extends AppCompatActivity {
 
                     @Override
                     public void onResponse(JSONObject response) {
+                        // if there is no data then set an image to show that
+                        boolean success = false;
+                        try {
+                            success = response.getBoolean("success");
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        try {
+                            if (!success && response.has("message") && response.getString("message").contains("No staff found for the provided school ID")) {
+                                imageViewNoDataFound.setVisibility(View.VISIBLE);
+                                cardViewSelectAll.setVisibility(View.GONE);
+                                moreOptions.setVisibility(View.GONE);
+                                return; // Exit the method as no further processing is needed
+                            }
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        // else show the data
                         Toast.makeText(ReadyToPrintStudent.this, "Data Fetched Successfully", Toast.LENGTH_SHORT).show();
                         List<DynamicStudent> studentList = new ArrayList<>();
                         try {
@@ -833,7 +917,6 @@ public class ReadyToPrintStudent extends AppCompatActivity {
 
     // Method to update school list recycler view
     private void updateRecyclerView(List<DynamicStudent> studentList) {
-        recyclerView = findViewById(R.id.student_list_recycle);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(ReadyToPrintStudent.this));
         adapter = new DynamicStudentAdapter(studentList, ReadyToPrintStudent.this);

@@ -74,6 +74,19 @@
             </androidx.cardview.widget.CardView>
             <!-- End of toolbar -->
 
+            <!-- HOME Picture -->
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/home"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:text="HOME"/>
 
             <!-- Row 1 of Grid -->
             <LinearLayout
